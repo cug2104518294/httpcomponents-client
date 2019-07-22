@@ -1,29 +1,3 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
 package org.apache.hc.client5.http.io;
 
 import java.io.IOException;
@@ -47,6 +21,13 @@ import org.apache.hc.core5.util.Timeout;
  * data must be synchronized as methods of this interface may be executed
  * from multiple threads.
  * </p>
+ *
+ * 连接池组件，管理连接的整个生命周期。连接在连接池中创建、复用以及移除。
+ * Connection manager封装了对连接池的具体操作，比如向连接池租用和归还连接。
+ * Connection被创建出来后处于闲置状态，由连接池管理，调用时会校验是否是open状态，不是的话会进行connect。
+ * connect的过程就是 基于不同schema(主要是http和https)创建不同的socket连接(ssl和plain)并且将http请求（连接）绑定到socket。
+ * 同时连接也会因为心跳或者过期等原因被close变成stale状态，直至被下一次get到时或者连接满时被清理出去。
+ * 同时连接池还能对连接进行限流–全局和单route连接数。
  *
  * @since 4.3
  */

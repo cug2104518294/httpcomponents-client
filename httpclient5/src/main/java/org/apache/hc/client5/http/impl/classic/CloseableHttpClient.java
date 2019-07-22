@@ -1,30 +1,3 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.impl.classic;
 
 import java.io.Closeable;
@@ -50,6 +23,18 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Base implementation of {@link HttpClient} that also implements {@link Closeable}.
+ *
+ * MinimalHttpClient 是一个极简版的实现，是核心设计的最直接简单的提现。
+ * 而 InternalHttpClient 则是一个完全可配置版本，提供最丰富完善的功能。
+ *
+ * HttpClients 是一个工厂类，专门生产各种HttpClient和Builder。
+ * 而HttpClientBuilder用于生成 InternalHttpClient，让配置更加规范易用。
+ *     
+ * 补充：
+ * InternalHttpClient是一个非常有意思的类，它不是Public的，是 CloseableHttpClient 的一个实现，只能通过HttpClientBuilder来生成。
+ * 而InternalHttpClient的生成过程又依赖了其他的多个非公开类，也就是说，InternalHttpClient 很难支持继承之后重写这样的定制开发方式（除非你把依赖的非公开类都拷贝出来）。
+ * 这也算是充分利用Java特性维持对象的可控，这些核心的类本身，对于不是特别理解源码的人，直接继承修改，确实可能带来各种问题。 
+ *
  *
  * @since 4.3
  */

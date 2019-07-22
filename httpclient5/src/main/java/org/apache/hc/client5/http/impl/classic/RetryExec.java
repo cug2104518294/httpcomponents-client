@@ -27,8 +27,6 @@
 
 package org.apache.hc.client5.http.impl.classic;
 
-import java.io.IOException;
-
 import org.apache.hc.client5.http.HttpRequestRetryHandler;
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.classic.ExecChain;
@@ -37,14 +35,12 @@ import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.annotation.Contract;
 import org.apache.hc.core5.annotation.Internal;
 import org.apache.hc.core5.annotation.ThreadingBehavior;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpException;
-import org.apache.hc.core5.http.NoHttpResponseException;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.util.Args;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Request execution handler in the classic request execution chain
@@ -83,7 +79,7 @@ public final class RetryExec implements ExecChainHandler {
         final HttpRoute route = scope.route;
         final HttpClientContext context = scope.clientContext;
         ClassicHttpRequest currentRequest = request;
-        for (int execCount = 1;; execCount++) {
+        for (int execCount = 1; ; execCount++) {
             try {
                 return chain.proceed(currentRequest, scope);
             } catch (final IOException ex) {
@@ -102,7 +98,7 @@ public final class RetryExec implements ExecChainHandler {
                         log.debug(exchangeId + ": " + ex.getMessage(), ex);
                     }
                     if (log.isInfoEnabled()) {
-                        log.info("Recoverable I/O exception ("+ ex.getClass().getName() + ") " +
+                        log.info("Recoverable I/O exception (" + ex.getClass().getName() + ") " +
                                 "caught when processing request to " + route);
                     }
                     currentRequest = ClassicRequestCopier.INSTANCE.copy(scope.originalRequest);

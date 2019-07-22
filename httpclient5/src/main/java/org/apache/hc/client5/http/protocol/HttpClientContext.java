@@ -1,42 +1,8 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.protocol;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.RouteInfo;
-import org.apache.hc.client5.http.auth.AuthCache;
-import org.apache.hc.client5.http.auth.AuthExchange;
-import org.apache.hc.client5.http.auth.AuthScheme;
-import org.apache.hc.client5.http.auth.AuthSchemeProvider;
-import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.*;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.CookieOrigin;
 import org.apache.hc.client5.http.cookie.CookieSpec;
@@ -48,6 +14,9 @@ import org.apache.hc.core5.http.protocol.BasicHttpContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.http.protocol.HttpCoreContext;
 import org.apache.hc.core5.util.Args;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Adaptor class that provides convenience type safe setters and getters
@@ -62,7 +31,7 @@ public class HttpClientContext extends HttpCoreContext {
      * Attribute name of a {@link RouteInfo}
      * object that represents the actual connection route.
      */
-    public static final String HTTP_ROUTE   = "http.route";
+    public static final String HTTP_ROUTE = "http.route";
 
     /**
      * Attribute name of a {@link RedirectLocations} object that represents a collection of all
@@ -74,55 +43,55 @@ public class HttpClientContext extends HttpCoreContext {
      * Attribute name of a {@link org.apache.hc.core5.http.config.Lookup} object that represents
      * the actual {@link CookieSpecProvider} registry.
      */
-    public static final String COOKIESPEC_REGISTRY   = "http.cookiespec-registry";
+    public static final String COOKIESPEC_REGISTRY = "http.cookiespec-registry";
 
     /**
      * Attribute name of a {@link org.apache.hc.client5.http.cookie.CookieSpec}
      * object that represents the actual cookie specification.
      */
-    public static final String COOKIE_SPEC           = "http.cookie-spec";
+    public static final String COOKIE_SPEC = "http.cookie-spec";
 
     /**
      * Attribute name of a {@link org.apache.hc.client5.http.cookie.CookieOrigin}
      * object that represents the actual details of the origin server.
      */
-    public static final String COOKIE_ORIGIN         = "http.cookie-origin";
+    public static final String COOKIE_ORIGIN = "http.cookie-origin";
 
     /**
      * Attribute name of a {@link CookieStore}
      * object that represents the actual cookie store.
      */
-    public static final String COOKIE_STORE          = "http.cookie-store";
+    public static final String COOKIE_STORE = "http.cookie-store";
 
     /**
      * Attribute name of a {@link CredentialsProvider}
      * object that represents the actual credentials provider.
      */
-    public static final String CREDS_PROVIDER        = "http.auth.credentials-provider";
+    public static final String CREDS_PROVIDER = "http.auth.credentials-provider";
 
     /**
      * Attribute name of a {@link AuthCache} object
      * that represents the auth scheme cache.
      */
-    public static final String AUTH_CACHE            = "http.auth.auth-cache";
+    public static final String AUTH_CACHE = "http.auth.auth-cache";
 
     /**
      * Attribute name of a map containing actual {@link AuthExchange}s keyed by their respective
      * {@link org.apache.hc.core5.http.HttpHost}.
      */
-    public static final String AUTH_EXCHANGE_MAP     = "http.auth.exchanges";
+    public static final String AUTH_EXCHANGE_MAP = "http.auth.exchanges";
 
     /**
      * Attribute name of a {@link java.lang.Object} object that represents
      * the actual user identity such as user {@link java.security.Principal}.
      */
-    public static final String USER_TOKEN            = "http.user-token";
+    public static final String USER_TOKEN = "http.user-token";
 
     /**
      * Attribute name of a {@link org.apache.hc.core5.http.config.Lookup} object that represents
      * the actual {@link AuthSchemeProvider} registry.
      */
-    public static final String AUTHSCHEME_REGISTRY   = "http.authscheme-registry";
+    public static final String AUTHSCHEME_REGISTRY = "http.authscheme-registry";
 
     /**
      * Attribute name of a {@link org.apache.hc.client5.http.config.RequestConfig} object that

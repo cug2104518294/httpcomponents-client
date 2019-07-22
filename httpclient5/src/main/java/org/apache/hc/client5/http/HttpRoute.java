@@ -1,31 +1,10 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http;
+
+import org.apache.hc.core5.annotation.Contract;
+import org.apache.hc.core5.annotation.ThreadingBehavior;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.util.Args;
+import org.apache.hc.core5.util.LangUtils;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -34,21 +13,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.hc.core5.annotation.Contract;
-import org.apache.hc.core5.annotation.ThreadingBehavior;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.util.Args;
-import org.apache.hc.core5.util.LangUtils;
-
 /**
  * Connection route definition for HTTP requests.
+ * <p>
+ * 指示对方服务器地址。HttpRoutePlanner用来创建HttpRoute。
+ * 后者代表客户端request的对端服务器，主要包含rout的host以及proxy信息
  *
  * @since 4.0
  */
 @Contract(threading = ThreadingBehavior.IMMUTABLE)
 public final class HttpRoute implements RouteInfo, Cloneable {
 
-    /** The target host to connect to. */
+    /**
+     * The target host to connect to.
+     */
     private final HttpHost targetHost;
 
     /**
@@ -57,20 +35,28 @@ public final class HttpRoute implements RouteInfo, Cloneable {
      */
     private final InetAddress localAddress;
 
-    /** The proxy servers, if any. Never null. */
+    /**
+     * The proxy servers, if any. Never null.
+     */
     private final List<HttpHost> proxyChain;
 
-    /** Whether the the route is tunnelled through the proxy. */
+    /**
+     * Whether the the route is tunnelled through the proxy.
+     */
     private final TunnelType tunnelled;
 
-    /** Whether the route is layered. */
+    /**
+     * Whether the route is layered.
+     */
     private final LayerType layered;
 
-    /** Whether the route is (supposed to be) secure. */
+    /**
+     * Whether the route is (supposed to be) secure.
+     */
     private final boolean secure;
 
     private HttpRoute(final HttpHost targetHost, final InetAddress local, final List<HttpHost> proxies,
-                     final boolean secure, final TunnelType tunnelled, final LayerType layered) {
+                      final boolean secure, final TunnelType tunnelled, final LayerType layered) {
         Args.notNull(targetHost, "Target host");
         Args.notNegative(targetHost.getPort(), "Target port");
         this.targetHost = targetHost;
@@ -83,9 +69,9 @@ public final class HttpRoute implements RouteInfo, Cloneable {
         if (tunnelled == TunnelType.TUNNELLED) {
             Args.check(this.proxyChain != null, "Proxy required if tunnelled");
         }
-        this.secure       = secure;
-        this.tunnelled    = tunnelled != null ? tunnelled : TunnelType.PLAIN;
-        this.layered      = layered != null ? layered : LayerType.PLAIN;
+        this.secure = secure;
+        this.tunnelled = tunnelled != null ? tunnelled : TunnelType.PLAIN;
+        this.layered = layered != null ? layered : LayerType.PLAIN;
     }
 
     /**
@@ -134,11 +120,11 @@ public final class HttpRoute implements RouteInfo, Cloneable {
      * Creates a new direct route.
      * That is a route without a proxy.
      *
-     * @param target    the host to which to route
-     * @param local     the local address to route from, or
-     *                  {@code null} for the default
-     * @param secure    {@code true} if the route is (to be) secure,
-     *                  {@code false} otherwise
+     * @param target the host to which to route
+     * @param local  the local address to route from, or
+     *               {@code null} for the default
+     * @param secure {@code true} if the route is (to be) secure,
+     *               {@code false} otherwise
      */
     public HttpRoute(final HttpHost target, final InetAddress local, final boolean secure) {
         this(target, local, Collections.<HttpHost>emptyList(), secure,
@@ -148,7 +134,7 @@ public final class HttpRoute implements RouteInfo, Cloneable {
     /**
      * Creates a new direct insecure route.
      *
-     * @param target    the host to which to route
+     * @param target the host to which to route
      */
     public HttpRoute(final HttpHost target) {
         this(target, null, Collections.<HttpHost>emptyList(), false,
@@ -161,26 +147,25 @@ public final class HttpRoute implements RouteInfo, Cloneable {
      * For convenience, it is assumed that a secure connection will be
      * layered over a tunnel through the proxy.
      *
-     * @param target    the host to which to route
-     * @param local     the local address to route from, or
-     *                  {@code null} for the default
-     * @param proxy     the proxy to use
-     * @param secure    {@code true} if the route is (to be) secure,
-     *                  {@code false} otherwise
+     * @param target the host to which to route
+     * @param local  the local address to route from, or
+     *               {@code null} for the default
+     * @param proxy  the proxy to use
+     * @param secure {@code true} if the route is (to be) secure,
+     *               {@code false} otherwise
      */
     public HttpRoute(final HttpHost target, final InetAddress local, final HttpHost proxy,
                      final boolean secure) {
         this(target, local, Collections.singletonList(Args.notNull(proxy, "Proxy host")), secure,
-             secure ? TunnelType.TUNNELLED : TunnelType.PLAIN,
-             secure ? LayerType.LAYERED    : LayerType.PLAIN);
+                secure ? TunnelType.TUNNELLED : TunnelType.PLAIN,
+                secure ? LayerType.LAYERED : LayerType.PLAIN);
     }
 
     /**
      * Creates a new plain route through a proxy.
      *
-     * @param target    the host to which to route
-     * @param proxy     the proxy to use
-     *
+     * @param target the host to which to route
+     * @param proxy  the proxy to use
      * @since 4.3
      */
     public HttpRoute(final HttpHost target, final HttpHost proxy) {
@@ -251,10 +236,9 @@ public final class HttpRoute implements RouteInfo, Cloneable {
     /**
      * Compares this route to another.
      *
-     * @param obj         the object to compare with
-     *
-     * @return  {@code true} if the argument is the same route,
-     *          {@code false}
+     * @param obj the object to compare with
+     * @return {@code true} if the argument is the same route,
+     * {@code false}
      */
     @Override
     public final boolean equals(final Object obj) {
@@ -264,13 +248,13 @@ public final class HttpRoute implements RouteInfo, Cloneable {
         if (obj instanceof HttpRoute) {
             final HttpRoute that = (HttpRoute) obj;
             return
-                // Do the cheapest tests first
-                (this.secure    == that.secure) &&
-                (this.tunnelled == that.tunnelled) &&
-                (this.layered   == that.layered) &&
-                LangUtils.equals(this.targetHost, that.targetHost) &&
-                LangUtils.equals(this.localAddress, that.localAddress) &&
-                LangUtils.equals(this.proxyChain, that.proxyChain);
+                    // Do the cheapest tests first
+                    (this.secure == that.secure) &&
+                            (this.tunnelled == that.tunnelled) &&
+                            (this.layered == that.layered) &&
+                            LangUtils.equals(this.targetHost, that.targetHost) &&
+                            LangUtils.equals(this.localAddress, that.localAddress) &&
+                            LangUtils.equals(this.proxyChain, that.proxyChain);
         }
         return false;
     }
@@ -279,7 +263,7 @@ public final class HttpRoute implements RouteInfo, Cloneable {
     /**
      * Generates a hash code for this route.
      *
-     * @return  the hash code
+     * @return the hash code
      */
     @Override
     public final int hashCode() {
@@ -300,11 +284,11 @@ public final class HttpRoute implements RouteInfo, Cloneable {
     /**
      * Obtains a description of this route.
      *
-     * @return  a human-readable representation of this route
+     * @return a human-readable representation of this route
      */
     @Override
     public final String toString() {
-        final StringBuilder cab = new StringBuilder(50 + getHopCount()*30);
+        final StringBuilder cab = new StringBuilder(50 + getHopCount() * 30);
         if (this.localAddress != null) {
             cab.append(this.localAddress);
             cab.append("->");

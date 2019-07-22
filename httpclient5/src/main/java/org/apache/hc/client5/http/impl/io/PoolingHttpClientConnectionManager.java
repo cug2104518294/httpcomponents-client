@@ -26,6 +26,31 @@
  */
 package org.apache.hc.client5.http.impl.io;
 
+import org.apache.hc.client5.http.DnsResolver;
+import org.apache.hc.client5.http.HttpRoute;
+import org.apache.hc.client5.http.SchemePortResolver;
+import org.apache.hc.client5.http.impl.ConnPoolSupport;
+import org.apache.hc.client5.http.impl.ConnectionShutdownException;
+import org.apache.hc.client5.http.io.*;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.annotation.Contract;
+import org.apache.hc.core5.annotation.Internal;
+import org.apache.hc.core5.annotation.ThreadingBehavior;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.impl.io.HttpRequestExecutor;
+import org.apache.hc.core5.http.io.HttpConnectionFactory;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.io.CloseMode;
+import org.apache.hc.core5.pool.*;
+import org.apache.hc.core5.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -35,50 +60,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-
-import org.apache.hc.client5.http.DnsResolver;
-import org.apache.hc.client5.http.HttpRoute;
-import org.apache.hc.client5.http.SchemePortResolver;
-import org.apache.hc.client5.http.impl.ConnPoolSupport;
-import org.apache.hc.client5.http.impl.ConnectionShutdownException;
-import org.apache.hc.client5.http.io.ConnectionEndpoint;
-import org.apache.hc.client5.http.io.HttpClientConnectionManager;
-import org.apache.hc.client5.http.io.HttpClientConnectionOperator;
-import org.apache.hc.client5.http.io.LeaseRequest;
-import org.apache.hc.client5.http.io.ManagedHttpClientConnection;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
-import org.apache.hc.core5.annotation.Contract;
-import org.apache.hc.core5.annotation.Internal;
-import org.apache.hc.core5.annotation.ThreadingBehavior;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.HttpException;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.URIScheme;
-import org.apache.hc.core5.http.config.Registry;
-import org.apache.hc.core5.http.config.RegistryBuilder;
-import org.apache.hc.core5.http.impl.io.HttpRequestExecutor;
-import org.apache.hc.core5.http.io.HttpConnectionFactory;
-import org.apache.hc.core5.http.io.SocketConfig;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.io.CloseMode;
-import org.apache.hc.core5.pool.ConnPoolControl;
-import org.apache.hc.core5.pool.LaxConnPool;
-import org.apache.hc.core5.pool.ManagedConnPool;
-import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
-import org.apache.hc.core5.pool.PoolEntry;
-import org.apache.hc.core5.pool.PoolReusePolicy;
-import org.apache.hc.core5.pool.PoolStats;
-import org.apache.hc.core5.pool.StrictConnPool;
-import org.apache.hc.core5.util.Args;
-import org.apache.hc.core5.util.Asserts;
-import org.apache.hc.core5.util.Identifiable;
-import org.apache.hc.core5.util.TimeValue;
-import org.apache.hc.core5.util.Timeout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * {@code ClientConnectionPoolManager} maintains a pool of
@@ -106,7 +87,7 @@ import org.slf4j.LoggerFactory;
  */
 @Contract(threading = ThreadingBehavior.SAFE_CONDITIONAL)
 public class PoolingHttpClientConnectionManager
-    implements HttpClientConnectionManager, ConnPoolControl<HttpRoute> {
+        implements HttpClientConnectionManager, ConnPoolControl<HttpRoute> {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -497,7 +478,6 @@ public class PoolingHttpClientConnectionManager
 
     /**
      * @see #setValidateAfterInactivity(TimeValue)
-     *
      * @since 4.4
      */
     public TimeValue getValidateAfterInactivity() {

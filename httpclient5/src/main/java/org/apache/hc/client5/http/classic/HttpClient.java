@@ -1,33 +1,4 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.classic;
-
-import java.io.IOException;
 
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ClassicHttpResponse;
@@ -36,11 +7,21 @@ import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.protocol.HttpContext;
 
+import java.io.IOException;
+
 /**
  * This interface represents only the most basic contract for HTTP request
  * execution. It imposes no restrictions or particular details on the request
  * execution process and leaves the specifics of state management,
  * authentication and redirect handling up to individual implementations.
+ * <p>
+ * <p>
+ * Http、tcp/ip、socket区别
+ * <p>
+ * Tcp/ip是传输层协议，而http则是建立在它之上的上层应用协议。
+ * Http聚焦在数据规范层面，tcp/ip则主要解决数据传输层面。建立在tcp/ip上的应用协议很多，像rpc，ftp等。
+ * Socket则是tcp/ip的一个编程实现，封装了传输层的众多细节，从而让协议层可以关注协议本身的处理而不用关注底层传输。
+ * 在程序里http请求（连接）最终一定需要绑定到一个具体的socket连接进行上行和下行传输。
  *
  * @since 4.0
  */
@@ -49,13 +30,12 @@ public interface HttpClient {
     /**
      * Executes HTTP request using the default context.
      *
-     * @param request   the request to execute
-     *
-     * @return  the response to the request. This is always a final response,
-     *          never an intermediate response with an 1xx status code.
-     *          Whether redirects or authentication challenges will be returned
-     *          or handled automatically depends on the implementation and
-     *          configuration of this client.
+     * @param request the request to execute
+     * @return the response to the request. This is always a final response,
+     * never an intermediate response with an 1xx status code.
+     * Whether redirects or authentication challenges will be returned
+     * or handled automatically depends on the implementation and
+     * configuration of this client.
      * @throws IOException in case of a problem or the connection was aborted
      */
     HttpResponse execute(ClassicHttpRequest request) throws IOException;
@@ -63,15 +43,14 @@ public interface HttpClient {
     /**
      * Executes HTTP request using the given context.
      *
-     * @param request   the request to execute
-     * @param context   the context to use for the execution, or
-     *                  {@code null} to use the default context
-     *
-     * @return  the response to the request. This is always a final response,
-     *          never an intermediate response with an 1xx status code.
-     *          Whether redirects or authentication challenges will be returned
-     *          or handled automatically depends on the implementation and
-     *          configuration of this client.
+     * @param request the request to execute
+     * @param context the context to use for the execution, or
+     *                {@code null} to use the default context
+     * @return the response to the request. This is always a final response,
+     * never an intermediate response with an 1xx status code.
+     * Whether redirects or authentication challenges will be returned
+     * or handled automatically depends on the implementation and
+     * configuration of this client.
      * @throws IOException in case of a problem or the connection was aborted
      */
     HttpResponse execute(ClassicHttpRequest request, HttpContext context) throws IOException;
@@ -79,37 +58,35 @@ public interface HttpClient {
     /**
      * Executes HTTP request using the default context.
      *
-     * @param target    the target host for the request.
-     *                  Implementations may accept {@code null}
-     *                  if they can still determine a route, for example
-     *                  to a default target or by inspecting the request.
-     * @param request   the request to execute
-     *
-     * @return  the response to the request. This is always a final response,
-     *          never an intermediate response with an 1xx status code.
-     *          Whether redirects or authentication challenges will be returned
-     *          or handled automatically depends on the implementation and
-     *          configuration of this client.
+     * @param target  the target host for the request.
+     *                Implementations may accept {@code null}
+     *                if they can still determine a route, for example
+     *                to a default target or by inspecting the request.
+     * @param request the request to execute
+     * @return the response to the request. This is always a final response,
+     * never an intermediate response with an 1xx status code.
+     * Whether redirects or authentication challenges will be returned
+     * or handled automatically depends on the implementation and
+     * configuration of this client.
      * @throws IOException in case of a problem or the connection was aborted
      */
-     ClassicHttpResponse execute(HttpHost target, ClassicHttpRequest request) throws IOException;
+    ClassicHttpResponse execute(HttpHost target, ClassicHttpRequest request) throws IOException;
 
     /**
      * Executes HTTP request using the given context.
      *
-     * @param target    the target host for the request.
-     *                  Implementations may accept {@code null}
-     *                  if they can still determine a route, for example
-     *                  to a default target or by inspecting the request.
-     * @param request   the request to execute
-     * @param context   the context to use for the execution, or
-     *                  {@code null} to use the default context
-     *
-     * @return  the response to the request. This is always a final response,
-     *          never an intermediate response with an 1xx status code.
-     *          Whether redirects or authentication challenges will be returned
-     *          or handled automatically depends on the implementation and
-     *          configuration of this client.
+     * @param target  the target host for the request.
+     *                Implementations may accept {@code null}
+     *                if they can still determine a route, for example
+     *                to a default target or by inspecting the request.
+     * @param request the request to execute
+     * @param context the context to use for the execution, or
+     *                {@code null} to use the default context
+     * @return the response to the request. This is always a final response,
+     * never an intermediate response with an 1xx status code.
+     * Whether redirects or authentication challenges will be returned
+     * or handled automatically depends on the implementation and
+     * configuration of this client.
      * @throws IOException in case of a problem or the connection was aborted
      */
     HttpResponse execute(HttpHost target, ClassicHttpRequest request, HttpContext context) throws IOException;
@@ -125,10 +102,9 @@ public interface HttpClient {
      * having to manage resource deallocation internally.
      * </p>
      *
-     * @param request   the request to execute
+     * @param request         the request to execute
      * @param responseHandler the response handler
-     *
-     * @return  the response object as generated by the response handler.
+     * @return the response object as generated by the response handler.
      * @throws IOException in case of a problem or the connection was aborted
      */
     <T> T execute(ClassicHttpRequest request, HttpClientResponseHandler<? extends T> responseHandler) throws IOException;
@@ -144,12 +120,11 @@ public interface HttpClient {
      * having to manage resource deallocation internally.
      * </p>
      *
-     * @param request   the request to execute
-     * @param context   the context to use for the execution, or
-     *                  {@code null} to use the default context
+     * @param request         the request to execute
+     * @param context         the context to use for the execution, or
+     *                        {@code null} to use the default context
      * @param responseHandler the response handler
-     *
-     * @return  the response object as generated by the response handler.
+     * @return the response object as generated by the response handler.
      * @throws IOException in case of a problem or the connection was aborted
      */
     <T> T execute(
@@ -168,14 +143,13 @@ public interface HttpClient {
      * having to manage resource deallocation internally.
      * </p>
      *
-     * @param target    the target host for the request.
-     *                  Implementations may accept {@code null}
-     *                  if they can still determine a route, for example
-     *                  to a default target or by inspecting the request.
-     * @param request   the request to execute
+     * @param target          the target host for the request.
+     *                        Implementations may accept {@code null}
+     *                        if they can still determine a route, for example
+     *                        to a default target or by inspecting the request.
+     * @param request         the request to execute
      * @param responseHandler the response handler
-     *
-     * @return  the response object as generated by the response handler.
+     * @return the response object as generated by the response handler.
      * @throws IOException in case of a problem or the connection was aborted
      */
     <T> T execute(
@@ -194,16 +168,15 @@ public interface HttpClient {
      * having to manage resource deallocation internally.
      * </p>
      *
-     * @param target    the target host for the request.
-     *                  Implementations may accept {@code null}
-     *                  if they can still determine a route, for example
-     *                  to a default target or by inspecting the request.
-     * @param request   the request to execute
-     * @param context   the context to use for the execution, or
-     *                  {@code null} to use the default context
+     * @param target          the target host for the request.
+     *                        Implementations may accept {@code null}
+     *                        if they can still determine a route, for example
+     *                        to a default target or by inspecting the request.
+     * @param request         the request to execute
+     * @param context         the context to use for the execution, or
+     *                        {@code null} to use the default context
      * @param responseHandler the response handler
-     *
-     * @return  the response object as generated by the response handler.
+     * @return the response object as generated by the response handler.
      * @throws IOException in case of a problem or the connection was aborted
      */
     <T> T execute(

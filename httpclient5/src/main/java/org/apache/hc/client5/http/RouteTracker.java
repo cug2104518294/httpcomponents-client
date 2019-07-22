@@ -27,12 +27,12 @@
 
 package org.apache.hc.client5.http;
 
-import java.net.InetAddress;
-
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.util.Args;
 import org.apache.hc.core5.util.Asserts;
 import org.apache.hc.core5.util.LangUtils;
+
+import java.net.InetAddress;
 
 /**
  * Helps tracking the steps in establishing a route.
@@ -41,7 +41,9 @@ import org.apache.hc.core5.util.LangUtils;
  */
 public final class RouteTracker implements RouteInfo, Cloneable {
 
-    /** The target host to connect to. */
+    /**
+     * The target host to connect to.
+     */
     private final HttpHost targetHost;
 
     /**
@@ -53,35 +55,45 @@ public final class RouteTracker implements RouteInfo, Cloneable {
     // the attributes above are fixed at construction time
     // now follow attributes that indicate the established route
 
-    /** Whether the first hop of the route is established. */
+    /**
+     * Whether the first hop of the route is established.
+     */
     private boolean connected;
 
-    /** The proxy chain, if any. */
+    /**
+     * The proxy chain, if any.
+     */
     private HttpHost[] proxyChain;
 
-    /** Whether the the route is tunnelled end-to-end through proxies. */
+    /**
+     * Whether the the route is tunnelled end-to-end through proxies.
+     */
     private TunnelType tunnelled;
 
-    /** Whether the route is layered over a tunnel. */
+    /**
+     * Whether the route is layered over a tunnel.
+     */
     private LayerType layered;
 
-    /** Whether the route is secure. */
+    /**
+     * Whether the route is secure.
+     */
     private boolean secure;
 
     /**
      * Creates a new route tracker.
      * The target and origin need to be specified at creation time.
      *
-     * @param target    the host to which to route
-     * @param local     the local address to route from, or
-     *                  {@code null} for the default
+     * @param target the host to which to route
+     * @param local  the local address to route from, or
+     *               {@code null} for the default
      */
     public RouteTracker(final HttpHost target, final InetAddress local) {
         Args.notNull(target, "Target host");
-        this.targetHost   = target;
+        this.targetHost = target;
         this.localAddress = local;
-        this.tunnelled    = TunnelType.PLAIN;
-        this.layered      = LayerType.PLAIN;
+        this.tunnelled = TunnelType.PLAIN;
+        this.layered = LayerType.PLAIN;
     }
 
     /**
@@ -100,7 +112,7 @@ public final class RouteTracker implements RouteInfo, Cloneable {
      * Only target and origin are taken from the route,
      * everything else remains to be tracked.
      *
-     * @param route     the route to track
+     * @param route the route to track
      */
     public RouteTracker(final HttpRoute route) {
         this(route.getTargetHost(), route.getLocalAddress());
@@ -109,8 +121,8 @@ public final class RouteTracker implements RouteInfo, Cloneable {
     /**
      * Tracks connecting to the target.
      *
-     * @param secure    {@code true} if the route is secure,
-     *                  {@code false} otherwise
+     * @param secure {@code true} if the route is secure,
+     *               {@code false} otherwise
      */
     public final void connectTarget(final boolean secure) {
         Asserts.check(!this.connected, "Already connected");
@@ -121,29 +133,29 @@ public final class RouteTracker implements RouteInfo, Cloneable {
     /**
      * Tracks connecting to the first proxy.
      *
-     * @param proxy     the proxy connected to
-     * @param secure    {@code true} if the route is secure,
-     *                  {@code false} otherwise
+     * @param proxy  the proxy connected to
+     * @param secure {@code true} if the route is secure,
+     *               {@code false} otherwise
      */
     public final void connectProxy(final HttpHost proxy, final boolean secure) {
         Args.notNull(proxy, "Proxy host");
         Asserts.check(!this.connected, "Already connected");
-        this.connected  = true;
-        this.proxyChain = new HttpHost[]{ proxy };
-        this.secure     = secure;
+        this.connected = true;
+        this.proxyChain = new HttpHost[]{proxy};
+        this.secure = secure;
     }
 
     /**
      * Tracks tunnelling to the target.
      *
-     * @param secure    {@code true} if the route is secure,
-     *                  {@code false} otherwise
+     * @param secure {@code true} if the route is secure,
+     *               {@code false} otherwise
      */
     public final void tunnelTarget(final boolean secure) {
         Asserts.check(this.connected, "No tunnel unless connected");
         Asserts.notNull(this.proxyChain, "No tunnel without proxy");
         this.tunnelled = TunnelType.TUNNELLED;
-        this.secure    = secure;
+        this.secure = secure;
     }
 
     /**
@@ -151,36 +163,36 @@ public final class RouteTracker implements RouteInfo, Cloneable {
      * This will extend the tracked proxy chain, but it does not mark
      * the route as tunnelled. Only end-to-end tunnels are considered there.
      *
-     * @param proxy     the proxy tunnelled to
-     * @param secure    {@code true} if the route is secure,
-     *                  {@code false} otherwise
+     * @param proxy  the proxy tunnelled to
+     * @param secure {@code true} if the route is secure,
+     *               {@code false} otherwise
      */
     public final void tunnelProxy(final HttpHost proxy, final boolean secure) {
         Args.notNull(proxy, "Proxy host");
         Asserts.check(this.connected, "No tunnel unless connected");
         Asserts.notNull(this.proxyChain, "No tunnel without proxy");
         // prepare an extended proxy chain
-        final HttpHost[] proxies = new HttpHost[this.proxyChain.length+1];
+        final HttpHost[] proxies = new HttpHost[this.proxyChain.length + 1];
         System.arraycopy(this.proxyChain, 0,
-                         proxies, 0, this.proxyChain.length);
-        proxies[proxies.length-1] = proxy;
+                proxies, 0, this.proxyChain.length);
+        proxies[proxies.length - 1] = proxy;
 
         this.proxyChain = proxies;
-        this.secure     = secure;
+        this.secure = secure;
     }
 
     /**
      * Tracks layering a protocol.
      *
-     * @param secure    {@code true} if the route is secure,
-     *                  {@code false} otherwise
+     * @param secure {@code true} if the route is secure,
+     *               {@code false} otherwise
      */
     public final void layerProtocol(final boolean secure) {
         // it is possible to layer a protocol over a direct connection,
         // although this case is probably not considered elsewhere
         Asserts.check(this.connected, "No layered protocol unless connected");
         this.layered = LayerType.LAYERED;
-        this.secure  = secure;
+        this.secure = secure;
     }
 
     @Override
@@ -212,7 +224,7 @@ public final class RouteTracker implements RouteInfo, Cloneable {
         final int hopcount = getHopCount();
         Args.check(hop < hopcount, "Hop index exceeds tracked route length");
         HttpHost result = null;
-        if (hop < hopcount-1) {
+        if (hop < hopcount - 1) {
             result = this.proxyChain[hop];
         } else {
             result = this.targetHost;
@@ -260,23 +272,22 @@ public final class RouteTracker implements RouteInfo, Cloneable {
      * If a route has been tracked, it is {@link #isConnected connected}.
      * If not connected, nothing has been tracked so far.
      *
-     * @return  the tracked route, or
-     *          {@code null} if nothing has been tracked so far
+     * @return the tracked route, or
+     * {@code null} if nothing has been tracked so far
      */
     public final HttpRoute toRoute() {
         return !this.connected ?
-            null : new HttpRoute(this.targetHost, this.localAddress,
-                                 this.proxyChain, this.secure,
-                                 this.tunnelled, this.layered);
+                null : new HttpRoute(this.targetHost, this.localAddress,
+                this.proxyChain, this.secure,
+                this.tunnelled, this.layered);
     }
 
     /**
      * Compares this tracked route to another.
      *
-     * @param o         the object to compare with
-     *
-     * @return  {@code true} if the argument is the same tracked route,
-     *          {@code false}
+     * @param o the object to compare with
+     * @return {@code true} if the argument is the same tracked route,
+     * {@code false}
      */
     @Override
     public final boolean equals(final Object o) {
@@ -289,14 +300,14 @@ public final class RouteTracker implements RouteInfo, Cloneable {
 
         final RouteTracker that = (RouteTracker) o;
         return
-            // Do the cheapest checks first
-            (this.connected == that.connected) &&
-            (this.secure    == that.secure) &&
-            (this.tunnelled == that.tunnelled) &&
-            (this.layered   == that.layered) &&
-            LangUtils.equals(this.targetHost, that.targetHost) &&
-            LangUtils.equals(this.localAddress, that.localAddress) &&
-            LangUtils.equals(this.proxyChain, that.proxyChain);
+                // Do the cheapest checks first
+                (this.connected == that.connected) &&
+                        (this.secure == that.secure) &&
+                        (this.tunnelled == that.tunnelled) &&
+                        (this.layered == that.layered) &&
+                        LangUtils.equals(this.targetHost, that.targetHost) &&
+                        LangUtils.equals(this.localAddress, that.localAddress) &&
+                        LangUtils.equals(this.proxyChain, that.proxyChain);
     }
 
     /**
@@ -305,7 +316,7 @@ public final class RouteTracker implements RouteInfo, Cloneable {
      * as lookup keys. Use {@link #toRoute toRoute} to obtain an
      * unmodifiable representation of the tracked route.
      *
-     * @return  the hash code
+     * @return the hash code
      */
     @Override
     public final int hashCode() {
@@ -327,11 +338,11 @@ public final class RouteTracker implements RouteInfo, Cloneable {
     /**
      * Obtains a description of the tracked route.
      *
-     * @return  a human-readable representation of the tracked route
+     * @return a human-readable representation of the tracked route
      */
     @Override
     public final String toString() {
-        final StringBuilder cab = new StringBuilder(50 + getHopCount()*30);
+        final StringBuilder cab = new StringBuilder(50 + getHopCount() * 30);
 
         cab.append("RouteTracker[");
         if (this.localAddress != null) {
