@@ -1,31 +1,46 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.impl.async;
+
+import org.apache.hc.client5.http.*;
+import org.apache.hc.client5.http.async.AsyncExecChainHandler;
+import org.apache.hc.client5.http.auth.AuthSchemeProvider;
+import org.apache.hc.client5.http.auth.AuthSchemes;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.KerberosConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieSpecProvider;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.impl.*;
+import org.apache.hc.client5.http.impl.auth.*;
+import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
+import org.apache.hc.client5.http.impl.routing.DefaultRoutePlanner;
+import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
+import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
+import org.apache.hc.client5.http.protocol.RequestExpectContinue;
+import org.apache.hc.client5.http.protocol.*;
+import org.apache.hc.client5.http.routing.HttpRoutePlanner;
+import org.apache.hc.core5.annotation.Internal;
+import org.apache.hc.core5.concurrent.DefaultThreadFactory;
+import org.apache.hc.core5.function.Callback;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.config.*;
+import org.apache.hc.core5.http.impl.DefaultConnectionReuseStrategy;
+import org.apache.hc.core5.http.nio.AsyncPushConsumer;
+import org.apache.hc.core5.http.nio.HandlerFactory;
+import org.apache.hc.core5.http.nio.command.ShutdownCommand;
+import org.apache.hc.core5.http.protocol.*;
+import org.apache.hc.core5.http2.HttpVersionPolicy;
+import org.apache.hc.core5.http2.config.H2Config;
+import org.apache.hc.core5.http2.protocol.H2RequestConnControl;
+import org.apache.hc.core5.http2.protocol.H2RequestContent;
+import org.apache.hc.core5.http2.protocol.H2RequestTargetHost;
+import org.apache.hc.core5.io.CloseMode;
+import org.apache.hc.core5.pool.ConnPoolControl;
+import org.apache.hc.core5.reactor.*;
+import org.apache.hc.core5.util.Args;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.VersionInfo;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -37,92 +52,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ThreadFactory;
-
-import org.apache.hc.client5.http.AuthenticationStrategy;
-import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
-import org.apache.hc.client5.http.HttpRequestRetryHandler;
-import org.apache.hc.client5.http.SchemePortResolver;
-import org.apache.hc.client5.http.SystemDefaultDnsResolver;
-import org.apache.hc.client5.http.UserTokenHandler;
-import org.apache.hc.client5.http.async.AsyncExecChainHandler;
-import org.apache.hc.client5.http.auth.AuthSchemeProvider;
-import org.apache.hc.client5.http.auth.AuthSchemes;
-import org.apache.hc.client5.http.auth.CredentialsProvider;
-import org.apache.hc.client5.http.auth.KerberosConfig;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.cookie.BasicCookieStore;
-import org.apache.hc.client5.http.cookie.CookieSpecProvider;
-import org.apache.hc.client5.http.cookie.CookieStore;
-import org.apache.hc.client5.http.impl.ChainElements;
-import org.apache.hc.client5.http.impl.CookieSpecSupport;
-import org.apache.hc.client5.http.impl.DefaultAuthenticationStrategy;
-import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
-import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryHandler;
-import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
-import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
-import org.apache.hc.client5.http.impl.DefaultUserTokenHandler;
-import org.apache.hc.client5.http.impl.IdleConnectionEvictor;
-import org.apache.hc.client5.http.impl.NoopUserTokenHandler;
-import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
-import org.apache.hc.client5.http.impl.auth.BasicSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.DigestSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.KerberosSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.NTLMSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.SPNegoSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.SystemDefaultCredentialsProvider;
-import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
-import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
-import org.apache.hc.client5.http.impl.routing.DefaultRoutePlanner;
-import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
-import org.apache.hc.client5.http.nio.AsyncClientConnectionManager;
-import org.apache.hc.client5.http.protocol.RedirectStrategy;
-import org.apache.hc.client5.http.protocol.RequestAddCookies;
-import org.apache.hc.client5.http.protocol.RequestAuthCache;
-import org.apache.hc.client5.http.protocol.RequestDefaultHeaders;
-import org.apache.hc.client5.http.protocol.RequestExpectContinue;
-import org.apache.hc.client5.http.protocol.ResponseProcessCookies;
-import org.apache.hc.client5.http.routing.HttpRoutePlanner;
-import org.apache.hc.core5.annotation.Internal;
-import org.apache.hc.core5.concurrent.DefaultThreadFactory;
-import org.apache.hc.core5.function.Callback;
-import org.apache.hc.core5.http.ConnectionReuseStrategy;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HttpException;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.HttpRequest;
-import org.apache.hc.core5.http.HttpRequestInterceptor;
-import org.apache.hc.core5.http.HttpResponse;
-import org.apache.hc.core5.http.HttpResponseInterceptor;
-import org.apache.hc.core5.http.config.CharCodingConfig;
-import org.apache.hc.core5.http.config.Http1Config;
-import org.apache.hc.core5.http.config.Lookup;
-import org.apache.hc.core5.http.config.NamedElementChain;
-import org.apache.hc.core5.http.config.RegistryBuilder;
-import org.apache.hc.core5.http.impl.DefaultConnectionReuseStrategy;
-import org.apache.hc.core5.http.nio.AsyncPushConsumer;
-import org.apache.hc.core5.http.nio.HandlerFactory;
-import org.apache.hc.core5.http.nio.command.ShutdownCommand;
-import org.apache.hc.core5.http.protocol.DefaultHttpProcessor;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.http.protocol.HttpProcessor;
-import org.apache.hc.core5.http.protocol.HttpProcessorBuilder;
-import org.apache.hc.core5.http.protocol.RequestTargetHost;
-import org.apache.hc.core5.http.protocol.RequestUserAgent;
-import org.apache.hc.core5.http2.HttpVersionPolicy;
-import org.apache.hc.core5.http2.config.H2Config;
-import org.apache.hc.core5.http2.protocol.H2RequestConnControl;
-import org.apache.hc.core5.http2.protocol.H2RequestContent;
-import org.apache.hc.core5.http2.protocol.H2RequestTargetHost;
-import org.apache.hc.core5.io.CloseMode;
-import org.apache.hc.core5.pool.ConnPoolControl;
-import org.apache.hc.core5.reactor.Command;
-import org.apache.hc.core5.reactor.DefaultConnectingIOReactor;
-import org.apache.hc.core5.reactor.IOEventHandlerFactory;
-import org.apache.hc.core5.reactor.IOReactorConfig;
-import org.apache.hc.core5.reactor.IOSession;
-import org.apache.hc.core5.util.Args;
-import org.apache.hc.core5.util.TimeValue;
-import org.apache.hc.core5.util.VersionInfo;
 
 /**
  * Builder for {@link CloseableHttpAsyncClient} instances that can negotiate
@@ -141,13 +70,13 @@ import org.apache.hc.core5.util.VersionInfo;
  * {@link #build()}.
  * </p>
  * <ul>
- *  <li>http.proxyHost</li>
- *  <li>http.proxyPort</li>
- *  <li>https.proxyHost</li>
- *  <li>https.proxyPort</li>
- *  <li>http.nonProxyHosts</li>
- *  <li>http.keepAlive</li>
- *  <li>http.agent</li>
+ * <li>http.proxyHost</li>
+ * <li>http.proxyPort</li>
+ * <li>https.proxyHost</li>
+ * <li>https.proxyPort</li>
+ * <li>http.nonProxyHosts</li>
+ * <li>http.keepAlive</li>
+ * <li>http.agent</li>
  * </ul>
  * <p>
  * Please note that some settings used by this class can be mutually
@@ -161,7 +90,7 @@ public class HttpAsyncClientBuilder {
 
     private static class RequestInterceptorEntry {
 
-        enum Postion { FIRST, LAST }
+        enum Postion {FIRST, LAST}
 
         final RequestInterceptorEntry.Postion postion;
         final HttpRequestInterceptor interceptor;
@@ -174,7 +103,7 @@ public class HttpAsyncClientBuilder {
 
     private static class ResponseInterceptorEntry {
 
-        enum Postion { FIRST, LAST }
+        enum Postion {FIRST, LAST}
 
         final ResponseInterceptorEntry.Postion postion;
         final HttpResponseInterceptor interceptor;
@@ -187,7 +116,7 @@ public class HttpAsyncClientBuilder {
 
     private static class ExecInterceptorEntry {
 
-        enum Postion { BEFORE, AFTER, REPLACE, FIRST, LAST }
+        enum Postion {BEFORE, AFTER, REPLACE, FIRST, LAST}
 
         final ExecInterceptorEntry.Postion postion;
         final String name;
@@ -303,7 +232,7 @@ public class HttpAsyncClientBuilder {
      * if the client is closed.
      *
      * @param shared defines whether or not the connection manager can be shared
-     *  by multiple clients.
+     *               by multiple clients.
      */
     public final HttpAsyncClientBuilder setConnectionManagerShared(final boolean shared) {
         this.connManagerShared = shared;
@@ -544,7 +473,7 @@ public class HttpAsyncClientBuilder {
      * Assigns default proxy value.
      * <p>
      * Please note this value can be overridden by the {@link #setRoutePlanner(
-     *   HttpRoutePlanner)} method.
+     *HttpRoutePlanner)} method.
      */
     public final HttpAsyncClientBuilder setProxy(final HttpHost proxy) {
         this.proxy = proxy;
@@ -685,12 +614,11 @@ public class HttpAsyncClientBuilder {
      * Please note this method has no effect if the instance of HttpClient is configuted to
      * use a shared connection manager.
      *
+     * @param maxIdleTime maximum time persistent connections can stay idle while kept alive
+     *                    in the connection pool. Connections whose inactivity period exceeds this value will
+     *                    get closed and evicted from the pool.
      * @see #setConnectionManagerShared(boolean)
      * @see ConnPoolControl#closeIdle(TimeValue)
-     *
-     * @param maxIdleTime maximum time persistent connections can stay idle while kept alive
-     * in the connection pool. Connections whose inactivity period exceeds this value will
-     * get closed and evicted from the pool.
      */
     public final HttpAsyncClientBuilder evictIdleConnections(final TimeValue maxIdleTime) {
         this.evictIdleConnections = true;
@@ -776,14 +704,14 @@ public class HttpAsyncClientBuilder {
 
         final HttpProcessorBuilder b = HttpProcessorBuilder.create();
         if (requestInterceptors != null) {
-            for (final RequestInterceptorEntry entry: requestInterceptors) {
+            for (final RequestInterceptorEntry entry : requestInterceptors) {
                 if (entry.postion == RequestInterceptorEntry.Postion.FIRST) {
                     b.addFirst(entry.interceptor);
                 }
             }
         }
         if (responseInterceptors != null) {
-            for (final ResponseInterceptorEntry entry: responseInterceptors) {
+            for (final ResponseInterceptorEntry entry : responseInterceptors) {
                 if (entry.postion == ResponseInterceptorEntry.Postion.FIRST) {
                     b.addFirst(entry.interceptor);
                 }
@@ -803,14 +731,14 @@ public class HttpAsyncClientBuilder {
             b.add(new ResponseProcessCookies());
         }
         if (requestInterceptors != null) {
-            for (final RequestInterceptorEntry entry: requestInterceptors) {
+            for (final RequestInterceptorEntry entry : requestInterceptors) {
                 if (entry.postion == RequestInterceptorEntry.Postion.LAST) {
                     b.addFirst(entry.interceptor);
                 }
             }
         }
         if (responseInterceptors != null) {
-            for (final ResponseInterceptorEntry entry: responseInterceptors) {
+            for (final ResponseInterceptorEntry entry : responseInterceptors) {
                 if (entry.postion == ResponseInterceptorEntry.Postion.LAST) {
                     b.addFirst(entry.interceptor);
                 }
@@ -874,7 +802,7 @@ public class HttpAsyncClientBuilder {
             if (evictExpiredConnections || evictIdleConnections) {
                 if (connManagerCopy instanceof ConnPoolControl) {
                     final IdleConnectionEvictor connectionEvictor = new IdleConnectionEvictor((ConnPoolControl<?>) connManagerCopy,
-                            maxIdleTime,  maxIdleTime);
+                            maxIdleTime, maxIdleTime);
                     closeablesCopy.add(new Closeable() {
 
                         @Override
@@ -940,7 +868,7 @@ public class HttpAsyncClientBuilder {
                 });
 
         if (execInterceptors != null) {
-            for (final ExecInterceptorEntry entry: execInterceptors) {
+            for (final ExecInterceptorEntry entry : execInterceptors) {
                 switch (entry.postion) {
                     case AFTER:
                         execChainDefinition.addAfter(entry.existing, entry.interceptor, entry.name);

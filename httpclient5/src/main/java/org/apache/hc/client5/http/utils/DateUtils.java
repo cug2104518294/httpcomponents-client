@@ -1,45 +1,13 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.utils;
-
-import java.lang.ref.SoftReference;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.MessageHeaders;
 import org.apache.hc.core5.util.Args;
+
+import java.lang.ref.SoftReference;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * A utility class for parsing and formatting HTTP dates as used in cookies and
@@ -66,10 +34,10 @@ public final class DateUtils {
      */
     public static final String PATTERN_ASCTIME = "EEE MMM d HH:mm:ss yyyy";
 
-    private static final String[] DEFAULT_PATTERNS = new String[] {
-        PATTERN_RFC1123,
-        PATTERN_RFC1036,
-        PATTERN_ASCTIME
+    private static final String[] DEFAULT_PATTERNS = new String[]{
+            PATTERN_RFC1123,
+            PATTERN_RFC1036,
+            PATTERN_ASCTIME
     };
 
     private static final Date DEFAULT_TWO_DIGIT_YEAR_START;
@@ -89,7 +57,6 @@ public final class DateUtils {
      * the default http params.
      *
      * @param dateValue the date value to parse
-     *
      * @return the parsed date or null if input could not be parsed
      */
     public static Date parseDate(final String dateValue) {
@@ -99,11 +66,9 @@ public final class DateUtils {
     /**
      * Parses a date value from a header with the given name.
      *
-     * @param headers message headers
+     * @param headers    message headers
      * @param headerName header name
-     *
      * @return the parsed date or null if input could not be parsed
-     *
      * @since 5.0
      */
     public static Date parseDate(final MessageHeaders headers, final String headerName) {
@@ -121,14 +86,12 @@ public final class DateUtils {
      * Tests if the first message is after (newer) than seconds message
      * using the given message header for comparison.
      *
-     * @param message1 the first message
-     * @param message2 the second message
+     * @param message1   the first message
+     * @param message2   the second message
      * @param headerName header name
-     *
      * @return {@code true} if both messages contain a header with the given name
-     *  and the value of the header from the first message is newer that of
-     *  the second message.
-     *
+     * and the value of the header from the first message is newer that of
+     * the second message.
      * @since 5.0
      */
     public static boolean isAfter(
@@ -157,14 +120,12 @@ public final class DateUtils {
      * Tests if the first message is before (older) than seconds message
      * using the given message header for comparison.
      *
-     * @param message1 the first message
-     * @param message2 the second message
+     * @param message1   the first message
+     * @param message2   the second message
      * @param headerName header name
-     *
      * @return {@code true} if both messages contain a header with the given name
-     *  and the value of the header from the first message is older that of
-     *  the second message.
-     *
+     * and the value of the header from the first message is older that of
+     * the second message.
      * @since 5.0
      */
     public static boolean isBefore(
@@ -192,9 +153,8 @@ public final class DateUtils {
     /**
      * Parses the date value using the given date formats.
      *
-     * @param dateValue the date value to parse
+     * @param dateValue   the date value to parse
      * @param dateFormats the date formats to use
-     *
      * @return the parsed date or null if input could not be parsed
      */
     public static Date parseDate(final String dateValue, final String[] dateFormats) {
@@ -204,13 +164,12 @@ public final class DateUtils {
     /**
      * Parses the date value using the given date formats.
      *
-     * @param dateValue the date value to parse
+     * @param dateValue   the date value to parse
      * @param dateFormats the date formats to use
-     * @param startDate During parsing, two digit years will be placed in the range
-     * {@code startDate} to {@code startDate + 100 years}. This value may
-     * be {@code null}. When {@code null} is given as a parameter, year
-     * {@code 2000} will be used.
-     *
+     * @param startDate   During parsing, two digit years will be placed in the range
+     *                    {@code startDate} to {@code startDate + 100 years}. This value may
+     *                    be {@code null}. When {@code null} is given as a parameter, year
+     *                    {@code 2000} will be used.
      * @return the parsed date or null if input could not be parsed
      */
     public static Date parseDate(
@@ -224,7 +183,7 @@ public final class DateUtils {
         // trim single quotes around date if present
         // see issue #5279
         if (v.length() > 1 && v.startsWith("'") && v.endsWith("'")) {
-            v = v.substring (1, v.length() - 1);
+            v = v.substring(1, v.length() - 1);
         }
 
         for (final String dateFormat : localDateFormats) {
@@ -244,7 +203,6 @@ public final class DateUtils {
      *
      * @param date The date to format.
      * @return An RFC 1123 formatted date string.
-     *
      * @see #PATTERN_RFC1123
      */
     public static String formatDate(final Date date) {
@@ -256,12 +214,10 @@ public final class DateUtils {
      * must conform to that used by the {@link SimpleDateFormat simple date
      * format} class.
      *
-     * @param date The date to format.
+     * @param date    The date to format.
      * @param pattern The pattern to use for formatting the date.
      * @return A formatted date string.
-     *
      * @throws IllegalArgumentException If the given date pattern is invalid.
-     *
      * @see SimpleDateFormat
      */
     public static String formatDate(final Date date, final String pattern) {
@@ -280,7 +236,9 @@ public final class DateUtils {
         DateFormatHolder.clearThreadLocal();
     }
 
-    /** This class should not be instantiated. */
+    /**
+     * This class should not be instantiated.
+     */
     private DateUtils() {
     }
 
@@ -288,7 +246,6 @@ public final class DateUtils {
      * A factory for {@link SimpleDateFormat}s. The instances are stored in a
      * threadlocal way because SimpleDateFormat is not threadsafe as noted in
      * {@link SimpleDateFormat its javadoc}.
-     *
      */
     final static class DateFormatHolder {
 
@@ -297,14 +254,13 @@ public final class DateUtils {
         /**
          * creates a {@link SimpleDateFormat} for the requested format string.
          *
-         * @param pattern
-         *            a non-{@code null} format String according to
-         *            {@link SimpleDateFormat}. The format is not checked against
-         *            {@code null} since all paths go through
-         *            {@link DateUtils}.
+         * @param pattern a non-{@code null} format String according to
+         *                {@link SimpleDateFormat}. The format is not checked against
+         *                {@code null} since all paths go through
+         *                {@link DateUtils}.
          * @return the requested format. This simple dateformat should not be used
-         *         to {@link SimpleDateFormat#applyPattern(String) apply} to a
-         *         different pattern.
+         * to {@link SimpleDateFormat#applyPattern(String) apply} to a
+         * different pattern.
          */
         public static SimpleDateFormat formatFor(final String pattern) {
             final SoftReference<Map<String, SimpleDateFormat>> ref = THREADLOCAL_FORMATS.get();
@@ -327,7 +283,5 @@ public final class DateUtils {
         public static void clearThreadLocal() {
             THREADLOCAL_FORMATS.remove();
         }
-
     }
-
 }

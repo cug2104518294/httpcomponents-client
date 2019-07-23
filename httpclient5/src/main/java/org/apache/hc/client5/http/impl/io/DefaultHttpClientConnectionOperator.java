@@ -1,45 +1,6 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
 package org.apache.hc.client5.http.impl.io;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NoRouteToHostException;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-
-import org.apache.hc.client5.http.ConnectTimeoutException;
-import org.apache.hc.client5.http.DnsResolver;
-import org.apache.hc.client5.http.HttpHostConnectException;
-import org.apache.hc.client5.http.SchemePortResolver;
-import org.apache.hc.client5.http.SystemDefaultDnsResolver;
-import org.apache.hc.client5.http.UnsupportedSchemeException;
+import org.apache.hc.client5.http.*;
 import org.apache.hc.client5.http.impl.ConnPoolSupport;
 import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
 import org.apache.hc.client5.http.io.HttpClientConnectionOperator;
@@ -59,6 +20,9 @@ import org.apache.hc.core5.util.Args;
 import org.apache.hc.core5.util.TimeValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.*;
 
 /**
  * Default implementation of {@link HttpClientConnectionOperator} used as default in Http client,
@@ -87,9 +51,9 @@ public class DefaultHttpClientConnectionOperator implements HttpClientConnection
         Args.notNull(socketFactoryRegistry, "Socket factory registry");
         this.socketFactoryRegistry = socketFactoryRegistry;
         this.schemePortResolver = schemePortResolver != null ? schemePortResolver :
-            DefaultSchemePortResolver.INSTANCE;
+                DefaultSchemePortResolver.INSTANCE;
         this.dnsResolver = dnsResolver != null ? dnsResolver :
-            SystemDefaultDnsResolver.INSTANCE;
+                SystemDefaultDnsResolver.INSTANCE;
     }
 
     @SuppressWarnings("unchecked")
@@ -120,7 +84,7 @@ public class DefaultHttpClientConnectionOperator implements HttpClientConnection
             throw new UnsupportedSchemeException(host.getSchemeName() + " protocol is not supported");
         }
         final InetAddress[] addresses = host.getAddress() != null ?
-                new InetAddress[] { host.getAddress() } : this.dnsResolver.resolve(host.getHostName());
+                new InetAddress[]{host.getAddress()} : this.dnsResolver.resolve(host.getHostName());
         final int port = this.schemePortResolver.resolve(host);
         for (int i = 0; i < addresses.length; i++) {
             final InetAddress address = addresses[i];

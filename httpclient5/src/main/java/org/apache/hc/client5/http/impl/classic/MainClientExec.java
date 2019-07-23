@@ -72,15 +72,12 @@ public final class MainClientExec implements ExecChainHandler {
         }
         try {
             RequestEntityProxy.enhance(request);
-
             final ClassicHttpResponse response = execRuntime.execute(exchangeId, request, context);
-
             Object userToken = context.getUserToken();
             if (userToken == null) {
                 userToken = userTokenHandler.getUserToken(route, context);
                 context.setAttribute(HttpClientContext.USER_TOKEN, userToken);
             }
-
             // The connection is in or can be brought to a re-usable state.
             if (reuseStrategy.keepAlive(request, response, context)) {
                 // Set the idle duration of this connection
@@ -122,5 +119,4 @@ public final class MainClientExec implements ExecChainHandler {
         }
 
     }
-
 }

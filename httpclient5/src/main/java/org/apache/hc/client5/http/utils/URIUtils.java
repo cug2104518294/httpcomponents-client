@@ -1,44 +1,14 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
 package org.apache.hc.client5.http.utils;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Stack;
 
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.net.URIAuthority;
 import org.apache.hc.core5.net.URIBuilder;
 import org.apache.hc.core5.util.Args;
 import org.apache.hc.core5.util.TextUtils;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * A collection of utilities for {@link URI URIs}, to workaround
@@ -54,15 +24,10 @@ public class URIUtils {
      * fragment are taken from the existing URI. The fragment is only used if
      * dropFragment is false. The path is set to "/" if not explicitly specified.
      *
-     * @param uri
-     *            Contains the path, query and fragment to use.
-     * @param target
-     *            Contains the scheme, host and port to use.
-     * @param dropFragment
-     *            True if the fragment should not be copied.
-     *
-     * @throws URISyntaxException
-     *             If the resulting URI is invalid.
+     * @param uri          Contains the path, query and fragment to use.
+     * @param target       Contains the scheme, host and port to use.
+     * @param dropFragment True if the fragment should not be copied.
+     * @throws URISyntaxException If the resulting URI is invalid.
      */
     public static URI rewriteURI(
             final URI uri,
@@ -119,10 +84,8 @@ public class URIUtils {
      * The path is set to "/" if not explicitly specified. The existing URI is returned
      * unmodified if it has no fragment or user-information and has a path.
      *
-     * @param uri
-     *            original URI.
-     * @throws URISyntaxException
-     *             If the resulting URI is invalid.
+     * @param uri original URI.
+     * @throws URISyntaxException If the resulting URI is invalid.
      */
     public static URI rewriteURI(final URI uri) throws URISyntaxException {
         Args.notNull(uri, "URI");
@@ -147,7 +110,7 @@ public class URIUtils {
      * Resolves a URI reference against a base URI. Work-around for bug in
      * java.net.URI (http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4708535)
      *
-     * @param baseURI the base URI
+     * @param baseURI   the base URI
      * @param reference the URI reference
      * @return the resulting URI
      */
@@ -159,11 +122,11 @@ public class URIUtils {
      * Resolves a URI reference against a base URI. Work-around for bugs in
      * java.net.URI (e.g. http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4708535)
      *
-     * @param baseURI the base URI
+     * @param baseURI   the base URI
      * @param reference the URI reference
      * @return the resulting URI
      */
-    public static URI resolve(final URI baseURI, final URI reference){
+    public static URI resolve(final URI baseURI, final URI reference) {
         Args.notNull(baseURI, "Base URI");
         Args.notNull(reference, "Reference URI");
         final String s = reference.toASCIIString();
@@ -243,7 +206,6 @@ public class URIUtils {
      * @param uri
      * @return the target host if the URI is absolute or {@code null} if the URI is
      * relative or does not contain a valid host name.
-     *
      * @since 4.1
      */
     public static HttpHost extractHost(final URI uri) {
@@ -261,8 +223,8 @@ public class URIUtils {
                     // Strip off any leading user credentials
                     final int at = host.indexOf('@');
                     if (at >= 0) {
-                        if (host.length() > at+1 ) {
-                            host = host.substring(at+1);
+                        if (host.length() > at + 1) {
+                            host = host.substring(at + 1);
                         } else {
                             host = null; // @ on its own
                         }
@@ -308,14 +270,11 @@ public class URIUtils {
      * the last request and scanning all the redirect locations for the last
      * fragment identifier, then combining the result into a {@link URI}.
      *
-     * @param originalURI
-     *            original request before any redirects
-     * @param target
-     *            if the last URI is relative, it is resolved against this target,
-     *            or {@code null} if not available.
-     * @param redirects
-     *            collection of redirect locations since the original request
-     *            or {@code null} if not available.
+     * @param originalURI original request before any redirects
+     * @param target      if the last URI is relative, it is resolved against this target,
+     *                    or {@code null} if not available.
+     * @param redirects   collection of redirect locations since the original request
+     *                    or {@code null} if not available.
      * @return interpreted (absolute) URI
      */
     public static URI resolve(

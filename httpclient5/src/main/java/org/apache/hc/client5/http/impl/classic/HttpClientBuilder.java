@@ -1,22 +1,6 @@
 package org.apache.hc.client5.http.impl.classic;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.ProxySelector;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.hc.client5.http.AuthenticationStrategy;
-import org.apache.hc.client5.http.ConnectionKeepAliveStrategy;
-import org.apache.hc.client5.http.HttpRequestRetryHandler;
-import org.apache.hc.client5.http.SchemePortResolver;
-import org.apache.hc.client5.http.ServiceUnavailableRetryStrategy;
-import org.apache.hc.client5.http.SystemDefaultDnsResolver;
-import org.apache.hc.client5.http.UserTokenHandler;
+import org.apache.hc.client5.http.*;
 import org.apache.hc.client5.http.auth.AuthSchemeProvider;
 import org.apache.hc.client5.http.auth.AuthSchemes;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
@@ -29,62 +13,35 @@ import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.CookieSpecProvider;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.entity.InputStreamFactory;
-import org.apache.hc.client5.http.impl.ChainElements;
-import org.apache.hc.client5.http.impl.CookieSpecSupport;
-import org.apache.hc.client5.http.impl.DefaultAuthenticationStrategy;
-import org.apache.hc.client5.http.impl.DefaultConnectionKeepAliveStrategy;
-import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryHandler;
-import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
-import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
-import org.apache.hc.client5.http.impl.DefaultUserTokenHandler;
-import org.apache.hc.client5.http.impl.IdleConnectionEvictor;
-import org.apache.hc.client5.http.impl.NoopUserTokenHandler;
-import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
-import org.apache.hc.client5.http.impl.auth.BasicSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.DigestSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.KerberosSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.NTLMSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.SPNegoSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.SystemDefaultCredentialsProvider;
+import org.apache.hc.client5.http.impl.*;
+import org.apache.hc.client5.http.impl.auth.*;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
 import org.apache.hc.client5.http.impl.routing.DefaultRoutePlanner;
 import org.apache.hc.client5.http.impl.routing.SystemDefaultRoutePlanner;
 import org.apache.hc.client5.http.io.HttpClientConnectionManager;
-import org.apache.hc.client5.http.protocol.RedirectStrategy;
-import org.apache.hc.client5.http.protocol.RequestAddCookies;
-import org.apache.hc.client5.http.protocol.RequestAuthCache;
-import org.apache.hc.client5.http.protocol.RequestClientConnControl;
-import org.apache.hc.client5.http.protocol.RequestDefaultHeaders;
 import org.apache.hc.client5.http.protocol.RequestExpectContinue;
-import org.apache.hc.client5.http.protocol.ResponseProcessCookies;
+import org.apache.hc.client5.http.protocol.*;
 import org.apache.hc.client5.http.routing.HttpRoutePlanner;
 import org.apache.hc.core5.annotation.Internal;
-import org.apache.hc.core5.http.ConnectionReuseStrategy;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.HttpRequest;
-import org.apache.hc.core5.http.HttpRequestInterceptor;
-import org.apache.hc.core5.http.HttpResponse;
-import org.apache.hc.core5.http.HttpResponseInterceptor;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.config.Lookup;
 import org.apache.hc.core5.http.config.NamedElementChain;
 import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.impl.DefaultConnectionReuseStrategy;
 import org.apache.hc.core5.http.impl.io.HttpRequestExecutor;
-import org.apache.hc.core5.http.protocol.DefaultHttpProcessor;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.http.protocol.HttpProcessor;
-import org.apache.hc.core5.http.protocol.HttpProcessorBuilder;
-import org.apache.hc.core5.http.protocol.RequestContent;
-import org.apache.hc.core5.http.protocol.RequestTargetHost;
-import org.apache.hc.core5.http.protocol.RequestUserAgent;
+import org.apache.hc.core5.http.protocol.*;
 import org.apache.hc.core5.pool.ConnPoolControl;
 import org.apache.hc.core5.util.Args;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.apache.hc.core5.util.VersionInfo;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.ProxySelector;
+import java.util.*;
 
 /**
  * Builder for {@link CloseableHttpClient} instances.
@@ -96,13 +53,13 @@ import org.apache.hc.core5.util.VersionInfo;
  * {@link #build()}.
  * </p>
  * <ul>
- *  <li>http.proxyHost</li>
- *  <li>http.proxyPort</li>
- *  <li>https.proxyHost</li>
- *  <li>https.proxyPort</li>
- *  <li>http.nonProxyHosts</li>
- *  <li>http.keepAlive</li>
- *  <li>http.agent</li>
+ * <li>http.proxyHost</li>
+ * <li>http.proxyPort</li>
+ * <li>https.proxyHost</li>
+ * <li>https.proxyPort</li>
+ * <li>http.nonProxyHosts</li>
+ * <li>http.keepAlive</li>
+ * <li>http.agent</li>
  * </ul>
  * <p>
  * Please note that some settings used by this class can be mutually
@@ -116,7 +73,7 @@ public class HttpClientBuilder {
 
     private static class RequestInterceptorEntry {
 
-        enum Postion { FIRST, LAST }
+        enum Postion {FIRST, LAST}
 
         final Postion postion;
         final HttpRequestInterceptor interceptor;
@@ -129,7 +86,7 @@ public class HttpClientBuilder {
 
     private static class ResponseInterceptorEntry {
 
-        enum Postion { FIRST, LAST }
+        enum Postion {FIRST, LAST}
 
         final Postion postion;
         final HttpResponseInterceptor interceptor;
@@ -142,7 +99,7 @@ public class HttpClientBuilder {
 
     private static class ExecInterceptorEntry {
 
-        enum Postion { BEFORE, AFTER, REPLACE, FIRST, LAST }
+        enum Postion {BEFORE, AFTER, REPLACE, FIRST, LAST}
 
         final Postion postion;
         final String name;
@@ -241,8 +198,7 @@ public class HttpClientBuilder {
      * </p>
      *
      * @param shared defines whether or not the connection manager can be shared
-     *  by multiple clients.
-     *
+     *               by multiple clients.
      * @since 4.4
      */
     public final HttpClientBuilder setConnectionManagerShared(
@@ -490,7 +446,7 @@ public class HttpClientBuilder {
      * Assigns default proxy value.
      * <p>
      * Please note this value can be overridden by the {@link #setRoutePlanner(
-     *   org.apache.hc.client5.http.routing.HttpRoutePlanner)} method.
+     *org.apache.hc.client5.http.routing.HttpRoutePlanner)} method.
      */
     public final HttpClientBuilder setProxy(final HttpHost proxy) {
         this.proxy = proxy;
@@ -511,7 +467,8 @@ public class HttpClientBuilder {
      * Please note this value can be overridden by the {@link #disableRedirectHandling()}
      * method.
      * </p>
-`     */
+     * `
+     */
     public final HttpClientBuilder setRedirectStrategy(final RedirectStrategy redirectStrategy) {
         this.redirectStrategy = redirectStrategy;
         return this;
@@ -588,7 +545,6 @@ public class HttpClientBuilder {
      * context.
      *
      * @see CookieSpecSupport
-     *
      */
     public final HttpClientBuilder setDefaultCookieSpecRegistry(
             final Lookup<CookieSpecProvider> cookieSpecRegistry) {
@@ -638,7 +594,6 @@ public class HttpClientBuilder {
      *
      * @see #setConnectionManagerShared(boolean)
      * @see ConnPoolControl#closeExpired()
-     *
      * @since 4.4
      */
     public final HttpClientBuilder evictExpiredConnections() {
@@ -656,13 +611,11 @@ public class HttpClientBuilder {
      * Please note this method has no effect if the instance of HttpClient is configured to
      * use a shared connection manager.
      *
+     * @param maxIdleTime maximum time persistent connections can stay idle while kept alive
+     *                    in the connection pool. Connections whose inactivity period exceeds this value will
+     *                    get closed and evicted from the pool.
      * @see #setConnectionManagerShared(boolean)
      * @see ConnPoolControl#closeIdle(TimeValue)
-     *
-     * @param maxIdleTime maximum time persistent connections can stay idle while kept alive
-     * in the connection pool. Connections whose inactivity period exceeds this value will
-     * get closed and evicted from the pool.
-     *
      * @since 4.4
      */
     public final HttpClientBuilder evictIdleConnections(final TimeValue maxIdleTime) {
@@ -782,14 +735,14 @@ public class HttpClientBuilder {
 
         final HttpProcessorBuilder b = HttpProcessorBuilder.create();
         if (requestInterceptors != null) {
-            for (final RequestInterceptorEntry entry: requestInterceptors) {
+            for (final RequestInterceptorEntry entry : requestInterceptors) {
                 if (entry.postion == RequestInterceptorEntry.Postion.FIRST) {
                     b.addFirst(entry.interceptor);
                 }
             }
         }
         if (responseInterceptors != null) {
-            for (final ResponseInterceptorEntry entry: responseInterceptors) {
+            for (final ResponseInterceptorEntry entry : responseInterceptors) {
                 if (entry.postion == ResponseInterceptorEntry.Postion.FIRST) {
                     b.addFirst(entry.interceptor);
                 }
@@ -812,14 +765,14 @@ public class HttpClientBuilder {
             b.add(new ResponseProcessCookies());
         }
         if (requestInterceptors != null) {
-            for (final RequestInterceptorEntry entry: requestInterceptors) {
+            for (final RequestInterceptorEntry entry : requestInterceptors) {
                 if (entry.postion == RequestInterceptorEntry.Postion.LAST) {
                     b.addFirst(entry.interceptor);
                 }
             }
         }
         if (responseInterceptors != null) {
-            for (final ResponseInterceptorEntry entry: responseInterceptors) {
+            for (final ResponseInterceptorEntry entry : responseInterceptors) {
                 if (entry.postion == ResponseInterceptorEntry.Postion.LAST) {
                     b.addFirst(entry.interceptor);
                 }
@@ -880,7 +833,7 @@ public class HttpClientBuilder {
             if (contentDecoderMap != null) {
                 final List<String> encodings = new ArrayList<>(contentDecoderMap.keySet());
                 final RegistryBuilder<InputStreamFactory> b2 = RegistryBuilder.create();
-                for (final Map.Entry<String, InputStreamFactory> entry: contentDecoderMap.entrySet()) {
+                for (final Map.Entry<String, InputStreamFactory> entry : contentDecoderMap.entrySet()) {
                     b2.register(entry.getKey(), entry.getValue());
                 }
                 final Registry<InputStreamFactory> decoderRegistry = b2.build();
@@ -901,7 +854,7 @@ public class HttpClientBuilder {
         }
 
         if (execInterceptors != null) {
-            for (final ExecInterceptorEntry entry: execInterceptors) {
+            for (final ExecInterceptorEntry entry : execInterceptors) {
                 switch (entry.postion) {
                     case AFTER:
                         execChainDefinition.addAfter(entry.existing, entry.interceptor, entry.name);
@@ -934,12 +887,12 @@ public class HttpClientBuilder {
         Lookup<AuthSchemeProvider> authSchemeRegistryCopy = this.authSchemeRegistry;
         if (authSchemeRegistryCopy == null) {
             authSchemeRegistryCopy = RegistryBuilder.<AuthSchemeProvider>create()
-                .register(AuthSchemes.BASIC.ident, new BasicSchemeFactory())
-                .register(AuthSchemes.DIGEST.ident, new DigestSchemeFactory())
-                .register(AuthSchemes.NTLM.ident, new NTLMSchemeFactory())
-                .register(AuthSchemes.SPNEGO.ident, new SPNegoSchemeFactory(KerberosConfig.DEFAULT, SystemDefaultDnsResolver.INSTANCE))
-                .register(AuthSchemes.KERBEROS.ident, new KerberosSchemeFactory(KerberosConfig.DEFAULT, SystemDefaultDnsResolver.INSTANCE))
-                .build();
+                    .register(AuthSchemes.BASIC.ident, new BasicSchemeFactory())
+                    .register(AuthSchemes.DIGEST.ident, new DigestSchemeFactory())
+                    .register(AuthSchemes.NTLM.ident, new NTLMSchemeFactory())
+                    .register(AuthSchemes.SPNEGO.ident, new SPNegoSchemeFactory(KerberosConfig.DEFAULT, SystemDefaultDnsResolver.INSTANCE))
+                    .register(AuthSchemes.KERBEROS.ident, new KerberosSchemeFactory(KerberosConfig.DEFAULT, SystemDefaultDnsResolver.INSTANCE))
+                    .build();
         }
         Lookup<CookieSpecProvider> cookieSpecRegistryCopy = this.cookieSpecRegistry;
         if (cookieSpecRegistryCopy == null) {

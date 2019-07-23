@@ -1,7 +1,5 @@
 package org.apache.hc.client5.http.classic;
 
-import java.io.IOException;
-
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.annotation.Contract;
@@ -10,6 +8,8 @@ import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.util.Args;
+
+import java.io.IOException;
 
 /**
  * Represents a single element in the client side classic request execution chain.

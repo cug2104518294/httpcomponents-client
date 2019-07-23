@@ -26,10 +26,6 @@
  */
 package org.apache.hc.client5.http.impl;
 
-import java.security.Principal;
-
-import javax.net.ssl.SSLSession;
-
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.UserTokenHandler;
 import org.apache.hc.client5.http.auth.AuthExchange;
@@ -38,6 +34,9 @@ import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.annotation.Contract;
 import org.apache.hc.core5.annotation.ThreadingBehavior;
 import org.apache.hc.core5.http.protocol.HttpContext;
+
+import javax.net.ssl.SSLSession;
+import java.security.Principal;
 
 /**
  * Default implementation of {@link UserTokenHandler}. This class will use
