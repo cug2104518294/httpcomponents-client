@@ -12,6 +12,9 @@ import java.net.Socket;
  * a connection manager. This interface extends {@link HttpClientConnection}
  * with methods to bind the connection to an arbitrary socket and
  * to obtain SSL session details.
+ * <p>
+ * 表示由连接管理器管理其状态和生命周期的托管连接。 此接口扩展
+ * HttpClientConnection具有将连接绑定到任意套接字并获取SSL会话详细信息的方法。
  *
  * @since 4.3
  */

@@ -1,39 +1,4 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.examples;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.charset.CodingErrorAction;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
-import javax.net.ssl.SSLContext;
 
 import org.apache.hc.client5.http.DnsResolver;
 import org.apache.hc.client5.http.HttpRoute;
@@ -56,11 +21,7 @@ import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
 import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.http.config.Http1Config;
 import org.apache.hc.core5.http.config.Registry;
@@ -69,11 +30,7 @@ import org.apache.hc.core5.http.impl.io.DefaultClassicHttpResponseFactory;
 import org.apache.hc.core5.http.impl.io.DefaultHttpRequestWriterFactory;
 import org.apache.hc.core5.http.impl.io.DefaultHttpResponseParser;
 import org.apache.hc.core5.http.impl.io.DefaultHttpResponseParserFactory;
-import org.apache.hc.core5.http.io.HttpConnectionFactory;
-import org.apache.hc.core5.http.io.HttpMessageParser;
-import org.apache.hc.core5.http.io.HttpMessageParserFactory;
-import org.apache.hc.core5.http.io.HttpMessageWriterFactory;
-import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.*;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.http.message.BasicLineParser;
@@ -84,6 +41,13 @@ import org.apache.hc.core5.ssl.SSLContexts;
 import org.apache.hc.core5.util.CharArrayBuffer;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
+
+import javax.net.ssl.SSLContext;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * This example demonstrates how to customize and configure the most common aspects
@@ -148,9 +112,9 @@ public class ClientConfiguration {
         // Create a registry of custom connection socket factories for supported
         // protocol schemes.
         final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-            .register("http", PlainConnectionSocketFactory.INSTANCE)
-            .register("https", new SSLConnectionSocketFactory(sslcontext))
-            .build();
+                .register("http", PlainConnectionSocketFactory.INSTANCE)
+                .register("https", new SSLConnectionSocketFactory(sslcontext))
+                .build();
 
         // Use custom DNS resolver to override the system DNS resolution.
         final DnsResolver dnsResolver = new SystemDefaultDnsResolver() {
@@ -158,7 +122,7 @@ public class ClientConfiguration {
             @Override
             public InetAddress[] resolve(final String host) throws UnknownHostException {
                 if (host.equalsIgnoreCase("myhost")) {
-                    return new InetAddress[] { InetAddress.getByAddress(new byte[] {127, 0, 0, 1}) };
+                    return new InetAddress[]{InetAddress.getByAddress(new byte[]{127, 0, 0, 1})};
                 } else {
                     return super.resolve(host);
                 }
@@ -173,8 +137,8 @@ public class ClientConfiguration {
 
         // Create socket configuration
         final SocketConfig socketConfig = SocketConfig.custom()
-            .setTcpNoDelay(true)
-            .build();
+                .setTcpNoDelay(true)
+                .build();
         // Configure the connection manager to use socket configuration either
         // by default or for a specific host.
         connManager.setDefaultSocketConfig(socketConfig);
@@ -193,11 +157,11 @@ public class ClientConfiguration {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         // Create global request configuration
         final RequestConfig defaultRequestConfig = RequestConfig.custom()
-            .setCookieSpec(CookieSpecs.STANDARD.ident)
-            .setExpectContinueEnabled(true)
-            .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM.ident, AuthSchemes.DIGEST.ident))
-            .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC.ident))
-            .build();
+                .setCookieSpec(CookieSpecs.STANDARD.ident)
+                .setExpectContinueEnabled(true)
+                .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM.ident, AuthSchemes.DIGEST.ident))
+                .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC.ident))
+                .build();
 
         // Create an HttpClient with the given custom dependencies and configuration.
 

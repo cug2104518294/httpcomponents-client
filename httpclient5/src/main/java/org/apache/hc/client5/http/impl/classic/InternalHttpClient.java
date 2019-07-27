@@ -122,6 +122,7 @@ class InternalHttpClient extends CloseableHttpClient implements Configurable {
             if (request.getAuthority() == null && target != null) {
                 request.setAuthority(new URIAuthority(target));
             }
+
             final HttpClientContext localcontext = HttpClientContext.adapt(
                     context != null ? context : new BasicHttpContext());
 

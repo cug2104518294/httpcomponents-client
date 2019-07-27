@@ -60,8 +60,10 @@ public final class MainClientExec implements ExecChainHandler {
             final ClassicHttpRequest request,
             final ExecChain.Scope scope,
             final ExecChain chain) throws IOException, HttpException {
+
         Args.notNull(request, "HTTP request");
         Args.notNull(scope, "Scope");
+
         final String exchangeId = scope.exchangeId;
         final HttpRoute route = scope.route;
         final HttpClientContext context = scope.clientContext;

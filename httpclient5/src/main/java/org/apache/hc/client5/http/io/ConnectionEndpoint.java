@@ -15,6 +15,9 @@ import java.io.IOException;
 /**
  * Client endpoint leased from a connection manager. Client points can be used
  * to execute HTTP requests.
+ * 客户端端点从连接管理器租用。
+ * 客户端点可用于执行HTTP请求。
+ *
  * <p>
  * Once the endpoint is no longer needed it MUST be released with {@link #close(org.apache.hc.core5.io.CloseMode)} )}.
  * </p>

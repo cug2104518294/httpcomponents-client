@@ -1,38 +1,12 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
 package org.apache.hc.client5.http.auth;
-
-import java.util.Locale;
 
 import org.apache.hc.core5.annotation.Contract;
 import org.apache.hc.core5.annotation.ThreadingBehavior;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.util.Args;
 import org.apache.hc.core5.util.LangUtils;
+
+import java.util.Locale;
 
 /**
  * {@code AuthScope} represents an authentication scope consisting of
@@ -54,16 +28,16 @@ public class AuthScope {
      * Defines auth scope with the given {@code protocol}, {@code host}, {@code port},
      * {@code realm}, and {@code schemeName}.
      *
-     * @param protocol application protocol. May be {@code null} if applies
-     *   to any protocol.
-     * @param host authentication host. May be {@code null} if applies
-     *   to any host.
-     * @param port authentication port. May be {@code -1} if applies
-     *   to any port of the host.
-     * @param realm authentication realm. May be {@code null} if applies
-     *   to any realm on the host.
+     * @param protocol   application protocol. May be {@code null} if applies
+     *                   to any protocol.
+     * @param host       authentication host. May be {@code null} if applies
+     *                   to any host.
+     * @param port       authentication port. May be {@code -1} if applies
+     *                   to any port of the host.
+     * @param realm      authentication realm. May be {@code null} if applies
+     *                   to any realm on the host.
      * @param authScheme authentication scheme. May be {@code null} if applies
-     *   to any authScheme supported by the host.
+     *                   to any authScheme supported by the host.
      */
     public AuthScope(
             final String protocol,
@@ -73,20 +47,19 @@ public class AuthScope {
             final String authScheme) {
         this.protocol = protocol != null ? protocol.toLowerCase(Locale.ROOT) : null;
         this.host = host != null ? host.toLowerCase(Locale.ROOT) : null;
-        this.port = port >= 0 ? port: -1;
+        this.port = port >= 0 ? port : -1;
         this.realm = realm;
-        this.authScheme = authScheme != null ? authScheme.toUpperCase(Locale.ROOT): null;
+        this.authScheme = authScheme != null ? authScheme.toUpperCase(Locale.ROOT) : null;
     }
 
     /**
      * Defines auth scope for a specific host of origin.
      *
-     * @param origin host of origin
-     * @param realm authentication realm. May be {@code null} if applies
-     *   to any realm on the host.
+     * @param origin     host of origin
+     * @param realm      authentication realm. May be {@code null} if applies
+     *                   to any realm on the host.
      * @param schemeName authentication authScheme. May be {@code null} if applies
-     *   to any authScheme supported by the host.
-     *
+     *                   to any authScheme supported by the host.
      * @since 4.2
      */
     public AuthScope(
@@ -98,14 +71,13 @@ public class AuthScope {
         this.host = origin.getHostName().toLowerCase(Locale.ROOT);
         this.port = origin.getPort() >= 0 ? origin.getPort() : -1;
         this.realm = realm;
-        this.authScheme = schemeName != null ? schemeName.toUpperCase(Locale.ROOT): null;
+        this.authScheme = schemeName != null ? schemeName.toUpperCase(Locale.ROOT) : null;
     }
 
     /**
      * Defines auth scope for a specific host of origin.
      *
      * @param origin host of origin
-     *
      * @since 4.2
      */
     public AuthScope(final HttpHost origin) {
@@ -116,9 +88,9 @@ public class AuthScope {
      * Defines auth scope with the given {@code host} and {@code port}.
      *
      * @param host authentication host. May be {@code null} if applies
-     *   to any host.
+     *             to any host.
      * @param port authentication port. May be {@code -1} if applies
-     *   to any port of the host.
+     *             to any port of the host.
      */
     public AuthScope(final String host, final int port) {
         this(null, host, port, null, null);
@@ -161,8 +133,8 @@ public class AuthScope {
      * Tests if the authentication scopes match.
      *
      * @return the match factor. Negative value signifies no match.
-     *    Non-negative signifies a match. The greater the returned value
-     *    the closer the match.
+     * Non-negative signifies a match. The greater the returned value
+     * the closer the match.
      */
     public int match(final AuthScope that) {
         int factor = 0;

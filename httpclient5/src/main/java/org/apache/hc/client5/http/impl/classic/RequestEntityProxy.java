@@ -1,17 +1,17 @@
 package org.apache.hc.client5.http.impl.classic;
 
+import org.apache.hc.core5.function.Supplier;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.hc.core5.function.Supplier;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HttpEntity;
-
-class RequestEntityProxy implements HttpEntity  {
+class RequestEntityProxy implements HttpEntity {
 
     static void enhance(final ClassicHttpRequest request) {
         final HttpEntity entity = request.getEntity();

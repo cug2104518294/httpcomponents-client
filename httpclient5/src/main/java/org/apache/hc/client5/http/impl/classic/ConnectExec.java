@@ -1,33 +1,4 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.impl.classic;
-
-import java.io.IOException;
 
 import org.apache.hc.client5.http.AuthenticationStrategy;
 import org.apache.hc.client5.http.HttpRoute;
@@ -46,16 +17,7 @@ import org.apache.hc.client5.http.routing.HttpRouteDirector;
 import org.apache.hc.core5.annotation.Contract;
 import org.apache.hc.core5.annotation.Internal;
 import org.apache.hc.core5.annotation.ThreadingBehavior;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.ClassicHttpResponse;
-import org.apache.hc.core5.http.ConnectionReuseStrategy;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpException;
-import org.apache.hc.core5.http.HttpHeaders;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.HttpRequest;
-import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.core5.http.HttpVersion;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.apache.hc.core5.http.message.StatusLine;
@@ -63,6 +25,8 @@ import org.apache.hc.core5.http.protocol.HttpProcessor;
 import org.apache.hc.core5.util.Args;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * Request execution handler in the classic request execution chain
@@ -90,11 +54,11 @@ public final class ConnectExec implements ExecChainHandler {
         Args.notNull(reuseStrategy, "Connection reuse strategy");
         Args.notNull(proxyHttpProcessor, "Proxy HTTP processor");
         Args.notNull(proxyAuthStrategy, "Proxy authentication strategy");
-        this.reuseStrategy      = reuseStrategy;
+        this.reuseStrategy = reuseStrategy;
         this.proxyHttpProcessor = proxyHttpProcessor;
-        this.proxyAuthStrategy  = proxyAuthStrategy;
-        this.authenticator      = new HttpAuthenticator(log);
-        this.routeDirector      = new BasicRouteDirector();
+        this.proxyAuthStrategy = proxyAuthStrategy;
+        this.authenticator = new HttpAuthenticator(log);
+        this.routeDirector = new BasicRouteDirector();
     }
 
     @Override
@@ -137,7 +101,7 @@ public final class ConnectExec implements ExecChainHandler {
                             break;
                         case HttpRouteDirector.CONNECT_PROXY:
                             execRuntime.connectEndpoint(context);
-                            final HttpHost proxy  = route.getProxyHost();
+                            final HttpHost proxy = route.getProxyHost();
                             tracker.connectProxy(proxy, route.isSecure() && !route.isTunnelled());
                             break;
                         case HttpRouteDirector.TUNNEL_TARGET: {
@@ -146,20 +110,22 @@ public final class ConnectExec implements ExecChainHandler {
                                 log.debug(exchangeId + ": tunnel to target created.");
                             }
                             tracker.tunnelTarget(secure);
-                        }   break;
+                        }
+                        break;
 
                         case HttpRouteDirector.TUNNEL_PROXY: {
                             // The most simple example for this case is a proxy chain
                             // of two proxies, where P1 must be tunnelled to P2.
                             // route: Source -> P1 -> P2 -> Target (3 hops)
                             // fact:  Source -> P1 -> Target       (2 hops)
-                            final int hop = fact.getHopCount()-1; // the hop to establish
+                            final int hop = fact.getHopCount() - 1; // the hop to establish
                             final boolean secure = createTunnelToProxy(route, hop, context);
                             if (log.isDebugEnabled()) {
                                 log.debug(exchangeId + ": tunnel to proxy created.");
                             }
                             tracker.tunnelProxy(route.getHopTarget(hop), secure);
-                        }   break;
+                        }
+                        break;
 
                         case HttpRouteDirector.LAYER_PROTOCOL:
                             execRuntime.upgradeTls(context);

@@ -1,12 +1,12 @@
 package org.apache.hc.client5.http.classic;
 
-import java.io.IOException;
-
 import org.apache.hc.core5.annotation.Contract;
 import org.apache.hc.core5.annotation.ThreadingBehavior;
 import org.apache.hc.core5.http.ClassicHttpRequest;
 import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.HttpException;
+
+import java.io.IOException;
 
 /**
  * Abstract request execution handler in a classic client side request execution chain.
@@ -31,8 +31,8 @@ public interface ExecChainHandler {
      * in the execution chain.
      *
      * @param request the actual request.
-     * @param scope the execution scope .
-     * @param chain the next element in the request execution chain.
+     * @param scope   the execution scope .
+     * @param chain   the next element in the request execution chain.
      */
     ClassicHttpResponse execute(
             ClassicHttpRequest request,

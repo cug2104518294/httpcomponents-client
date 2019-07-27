@@ -26,19 +26,15 @@
  */
 package org.apache.hc.client5.http.cookie;
 
+import org.apache.hc.core5.annotation.Contract;
+import org.apache.hc.core5.annotation.ThreadingBehavior;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.apache.hc.core5.annotation.Contract;
-import org.apache.hc.core5.annotation.ThreadingBehavior;
 
 /**
  * Default implementation of {@link CookieStore}
@@ -72,9 +68,7 @@ public class BasicCookieStore implements CookieStore, Serializable {
      * values will still be removed.
      *
      * @param cookie the {@link Cookie cookie} to be added
-     *
      * @see #addCookies(Cookie[])
-     *
      */
     @Override
     public void addCookie(final Cookie cookie) {
@@ -98,9 +92,7 @@ public class BasicCookieStore implements CookieStore, Serializable {
      * not be added, but existing values will still be removed.
      *
      * @param cookies the {@link Cookie cookies} to be added
-     *
      * @see #addCookie(Cookie)
-     *
      */
     public void addCookies(final Cookie[] cookies) {
         if (cookies != null) {
@@ -132,7 +124,6 @@ public class BasicCookieStore implements CookieStore, Serializable {
      * that have expired by the specified {@link java.util.Date date}.
      *
      * @return true if any cookies were purged.
-     *
      * @see Cookie#isExpired(Date)
      */
     @Override

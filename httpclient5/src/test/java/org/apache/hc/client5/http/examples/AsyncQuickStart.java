@@ -1,6 +1,5 @@
 package org.apache.hc.client5.http.examples;
 
-
 import org.apache.hc.client5.http.async.methods.AbstractCharResponseConsumer;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequests;

@@ -72,7 +72,6 @@ import java.util.*;
 public class HttpClientBuilder {
 
     private static class RequestInterceptorEntry {
-
         enum Postion {FIRST, LAST}
 
         final Postion postion;
@@ -661,7 +660,8 @@ public class HttpClientBuilder {
 
     public CloseableHttpClient build() {
         // Create main request executor
-        // We copy the instance fields to avoid changing them, and rename to avoid accidental use of the wrong version
+        // We copy the instance fields to avoid changing them,
+        // and rename to avoid accidental use of the wrong version
         HttpRequestExecutor requestExecCopy = this.requestExec;
         if (requestExecCopy == null) {
             requestExecCopy = new HttpRequestExecutor();
@@ -689,7 +689,6 @@ public class HttpClientBuilder {
                 reuseStrategyCopy = DefaultConnectionReuseStrategy.INSTANCE;
             }
         }
-
         ConnectionKeepAliveStrategy keepAliveStrategyCopy = this.keepAliveStrategy;
         if (keepAliveStrategyCopy == null) {
             keepAliveStrategyCopy = DefaultConnectionKeepAliveStrategy.INSTANCE;
@@ -722,6 +721,8 @@ public class HttpClientBuilder {
             }
         }
 
+
+        //责任链
         final NamedElementChain<ExecChainHandler> execChainDefinition = new NamedElementChain<>();
         execChainDefinition.addLast(
                 new MainClientExec(connManagerCopy, reuseStrategyCopy, keepAliveStrategyCopy, userTokenHandlerCopy),
@@ -778,11 +779,11 @@ public class HttpClientBuilder {
                 }
             }
         }
+
         final HttpProcessor httpProcessor = b.build();
         execChainDefinition.addFirst(
                 new ProtocolExec(httpProcessor, targetAuthStrategyCopy, proxyAuthStrategyCopy),
                 ChainElements.PROTOCOL.name());
-
         // Add request retry executor, if not disabled
         if (!automaticRetriesDisabled) {
             HttpRequestRetryHandler retryHandlerCopy = this.retryHandler;

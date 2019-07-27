@@ -1,39 +1,13 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
 package org.apache.hc.client5.http.auth;
-
-import java.io.Serializable;
-import java.security.Principal;
-import java.util.Locale;
 
 import org.apache.hc.core5.annotation.Contract;
 import org.apache.hc.core5.annotation.ThreadingBehavior;
 import org.apache.hc.core5.util.Args;
 import org.apache.hc.core5.util.LangUtils;
+
+import java.io.Serializable;
+import java.security.Principal;
+import java.util.Locale;
 
 /**
  * Microsoft Windows specific {@link Credentials} representation that includes
@@ -46,26 +20,35 @@ public class NTCredentials implements Credentials, Serializable {
 
     private static final long serialVersionUID = -7385699315228907265L;
 
-    /** The user principal  */
+    /**
+     * The user principal
+     */
     private final NTUserPrincipal principal;
 
-    /** Password */
+    /**
+     * Password
+     */
     private final char[] password;
 
-    /** The netbios hostname the authentication request is originating from.  */
+    /**
+     * The netbios hostname the authentication request is originating from.
+     */
     private final String workstation;
 
-    /** The netbios domain the authentication request is against */
+    /**
+     * The netbios domain the authentication request is against
+     */
     private final String netbiosDomain;
 
     /**
      * Constructor.
-     * @param userName The user name.  This should not include the domain to authenticate with.
-     * For example: "user" is correct whereas "DOMAIN&#x5c;user" is not.
-     * @param password The password.
+     *
+     * @param userName    The user name.  This should not include the domain to authenticate with.
+     *                    For example: "user" is correct whereas "DOMAIN&#x5c;user" is not.
+     * @param password    The password.
      * @param workstation The workstation the authentication request is originating from.
-     * Essentially, the computer name for this machine.
-     * @param domain The domain to authenticate within.
+     *                    Essentially, the computer name for this machine.
+     * @param domain      The domain to authenticate within.
      */
     public NTCredentials(
             final String userName,
@@ -77,12 +60,13 @@ public class NTCredentials implements Credentials, Serializable {
 
     /**
      * Constructor.
-     * @param userName The user name.  This should not include the domain to authenticate with.
-     * For example: "user" is correct whereas "DOMAIN&#x5c;user" is not.
-     * @param password The password.
-     * @param workstation The netbios workstation name that the authentication request is originating from.
-     * Essentially, the computer name for this machine.
-     * @param domain The domain to authenticate within.
+     *
+     * @param userName      The user name.  This should not include the domain to authenticate with.
+     *                      For example: "user" is correct whereas "DOMAIN&#x5c;user" is not.
+     * @param password      The password.
+     * @param workstation   The netbios workstation name that the authentication request is originating from.
+     *                      Essentially, the computer name for this machine.
+     * @param domain        The domain to authenticate within.
      * @param netbiosDomain The netbios version of the domain name.
      */
     public NTCredentials(
@@ -127,9 +111,10 @@ public class NTCredentials implements Credentials, Serializable {
     }
 
     /**
-    * Retrieves the netbios domain to authenticate with.
-    * @return String the netbios domain name.
-    */
+     * Retrieves the netbios domain to authenticate with.
+     *
+     * @return String the netbios domain name.
+     */
     public String getNetbiosDomain() {
         return this.netbiosDomain;
     }
@@ -181,7 +166,9 @@ public class NTCredentials implements Credentials, Serializable {
         return buffer.toString();
     }
 
-    /** Strip dot suffix from a name */
+    /**
+     * Strip dot suffix from a name
+     */
     private static String stripDotSuffix(final String value) {
         if (value == null) {
             return null;
@@ -193,12 +180,16 @@ public class NTCredentials implements Credentials, Serializable {
         return value;
     }
 
-    /** Convert host to standard form */
+    /**
+     * Convert host to standard form
+     */
     private static String convertHost(final String host) {
         return stripDotSuffix(host);
     }
 
-    /** Convert domain to standard form */
+    /**
+     * Convert domain to standard form
+     */
     private static String convertDomain(final String domain) {
         final String returnString = stripDotSuffix(domain);
         return returnString == null ? returnString : returnString.toUpperCase(Locale.ROOT);
