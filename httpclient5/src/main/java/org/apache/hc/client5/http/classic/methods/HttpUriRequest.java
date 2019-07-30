@@ -8,6 +8,11 @@ import org.apache.hc.core5.http.ClassicHttpRequest;
  * convenience methods to access request properties such as request URI
  * and method type.
  *
+ * Configurable 接口主要是http请求的相关基础  重点在于RequestConfig 代理 超时等
+ * ClassicHttpRequest 其实就是请求路径 协议版本等基本的请求
+ *
+ * HttpUriRequest 继承上面两个接口  并添加了是否丢弃对应的请求
+ *
  * @since 4.0
  */
 public interface HttpUriRequest extends ClassicHttpRequest, Configurable {

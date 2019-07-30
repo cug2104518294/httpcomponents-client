@@ -1,31 +1,16 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
-
 package org.apache.hc.client5.http.classic.methods;
+
+import org.apache.hc.client5.http.StandardMethods;
+import org.apache.hc.client5.http.config.Configurable;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.message.HeaderGroup;
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.hc.core5.util.Args;
 
 import java.io.IOException;
 import java.net.URI;
@@ -36,24 +21,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.hc.client5.http.StandardMethods;
-import org.apache.hc.client5.http.config.Configurable;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.Header;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpVersion;
-import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.ProtocolVersion;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.message.BasicHeader;
-import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.apache.hc.core5.http.message.HeaderGroup;
-import org.apache.hc.core5.net.URIBuilder;
-import org.apache.hc.core5.util.Args;
 
 /**
  * Builder for {@link ClassicHttpRequest} instances.
@@ -67,7 +34,6 @@ import org.apache.hc.core5.util.Args;
  * </p>
  *
  * @since 4.3
- *
  * @deprecated Use {@link org.apache.hc.core5.http.io.support.ClassicRequestBuilder}
  */
 @Deprecated
@@ -292,7 +258,7 @@ public class RequestBuilder {
         if (originalEntity != null) {
             final ContentType contentType = ContentType.parse(originalEntity.getContentType());
             if (contentType != null &&
-                contentType.getMimeType().equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
+                    contentType.getMimeType().equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
                 try {
                     final List<NameValuePair> formParams = EntityUtils.parse(originalEntity);
                     if (!formParams.isEmpty()) {
@@ -435,7 +401,7 @@ public class RequestBuilder {
 
     public List<NameValuePair> getParameters() {
         return parameters != null ? new ArrayList<>(parameters) :
-            new ArrayList<NameValuePair>();
+                new ArrayList<NameValuePair>();
     }
 
     public RequestBuilder addParameter(final NameValuePair nvp) {
@@ -452,7 +418,7 @@ public class RequestBuilder {
     }
 
     public RequestBuilder addParameters(final NameValuePair... nvps) {
-        for (final NameValuePair nvp: nvps) {
+        for (final NameValuePair nvp : nvps) {
             addParameter(nvp);
         }
         return this;
@@ -477,9 +443,9 @@ public class RequestBuilder {
             } else {
                 try {
                     uriNotNull = new URIBuilder(uriNotNull)
-                      .setCharset(this.charset)
-                      .addParameters(parameters)
-                      .build();
+                            .setCharset(this.charset)
+                            .addParameters(parameters)
+                            .build();
                 } catch (final URISyntaxException ex) {
                     // should never happen
                 }

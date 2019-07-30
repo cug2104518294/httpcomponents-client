@@ -4,8 +4,6 @@ import java.net.URI;
 
 /**
  * HTTP GET method.
- *
- * @since 4.0
  */
 public class HttpGet extends HttpUriRequestBase {
 

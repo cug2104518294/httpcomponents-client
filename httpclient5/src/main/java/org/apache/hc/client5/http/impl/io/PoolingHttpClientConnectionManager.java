@@ -1,29 +1,3 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
 package org.apache.hc.client5.http.impl.io;
 
 import org.apache.hc.client5.http.DnsResolver;
@@ -82,6 +56,16 @@ import java.util.concurrent.atomic.AtomicReference;
  * The code now only checks the connection if the elapsed time since
  * the last use of the connection exceeds the timeout that has been set.
  * The default timeout is set to 5000ms.
+ * <p>
+ * <p>
+ * PoolingHttpClientConnectionManager是个复杂的类，它管理着连接池，
+ * 可以同时为很多线程提供http连接请求。
+ * 当请求一个新的连接时，如果连接池有可用的持久连接，连接管理器就会使用其中的一个，
+ * 而不是再创建一个新的连接。
+ * <p>
+ * <p>
+ * PoolingHttpClientConnectionManager维护的连接数在每个路由基础和总数上都有限制。默认，每个路由基础上的连接不超过2个，总连接数不能超过20。在实际应用中，这个限制可能会太小了，尤其是当服务器也使用Http协议时。此处我们设置为最高200个总连接数和每个基础路由连接不超过20个。
+ * <p>
  *
  * @since 4.3
  */

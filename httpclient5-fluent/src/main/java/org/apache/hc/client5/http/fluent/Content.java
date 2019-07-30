@@ -1,47 +1,23 @@
-/*
- * ====================================================================
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
- */
 package org.apache.hc.client5.http.fluent;
+
+import org.apache.hc.core5.http.ContentType;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.hc.core5.http.ContentType;
-
 /**
  * This class represents arbitrary content of a specific type that can be consumed
  * multiple times and requires no explicit deallocation used by the fluent facade.
+ * <p>
+ * 此类表示可以多次使用的特定类型的任意内容，并且不需要流畅外观使用的显式释放。
  *
  * @since 4.2
  */
 public class Content {
 
-    public static final Content NO_CONTENT = new Content(new byte[] {}, ContentType.DEFAULT_BINARY);
+    public static final Content NO_CONTENT = new Content(new byte[]{}, ContentType.DEFAULT_BINARY);
 
     private final byte[] raw;
     private final ContentType type;
